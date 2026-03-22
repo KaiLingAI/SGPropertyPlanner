@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- SG Property Planner v4.1 | 1774191968 -->
+<!-- SG Property Planner v4.7 | 1774194399 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -149,8 +149,10 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer;margin-top:
 .ct th{font-size:10.5px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.5px;padding:7px 11px;text-align:left;border-bottom:1px solid var(--border)}
 .ct td{font-size:12.5px;padding:9px 11px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;word-break:break-word}
 .ct tr:last-child td{border-bottom:none}
+.ct-section-hdr{font-size:10.5px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:9px 11px 5px;background:var(--bg4);border-bottom:1px solid var(--border)}
+.ct-note{font-size:10px;color:var(--text3);line-height:1.5;display:block;margin-top:1px}
 .mono{font-family:'DM Mono',monospace;color:var(--text)}
-.editable-input{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:4px 8px;width:110px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);text-align:right;outline:none}
+.editable-input{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:4px 8px;width:100%;max-width:130px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);text-align:right;outline:none}
 .editable-input:focus{border-color:var(--blue2)}
 .tag{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500}
 .tag-req{background:rgba(224,92,92,0.12);color:#e59090;border:1px solid rgba(224,92,92,0.2)}
@@ -787,6 +789,98 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer;margin-top:
       </div>
     </div>
   </div>
+  <!-- CASH & CPF AVAILABILITY PLANNER -->
+  <div class="card" style="border-color:rgba(46,196,169,0.25)">
+    <div class="card-header" style="background:rgba(46,196,169,0.04)">
+      <span>💼</span>
+      <span class="card-title" style="color:var(--teal)">Cash & CPF Availability Planner</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--teal);background:rgba(46,196,169,0.12);border:1px solid rgba(46,196,169,0.25);padding:2px 8px;border-radius:10px">Optional — key in your balances</span>
+    </div>
+    <div class="card-body">
+      <!-- Inputs row -->
+      <div class="g2" style="gap:12px;margin-bottom:14px">
+        <div class="field-group" style="margin-bottom:0">
+          <div class="field-label">Cash on Hand (SGD)</div>
+          <input type="number" id="cash-onhand" placeholder="e.g. 80000" min="0" oninput="recalcFunds()" style="font-size:16px">
+          <div style="font-size:10.5px;color:var(--text3);margin-top:3px">Total liquid cash available for this purchase</div>
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <div class="field-label">CPF OA Balance (SGD)</div>
+          <input type="number" id="cpf-oa-balance" placeholder="e.g. 120000" min="0" oninput="recalcFunds()" style="font-size:16px">
+          <div style="font-size:10.5px;color:var(--text3);margin-top:3px">Your current Ordinary Account balance</div>
+        </div>
+      </div>
+      <div class="g2" style="gap:12px;margin-bottom:16px">
+        <div class="field-group" style="margin-bottom:0">
+          <div class="field-label">Property Remaining Lease (years)</div>
+          <input type="number" id="prop-lease" placeholder="e.g. 99" min="1" max="999" value="99" oninput="recalcFunds()" style="font-size:16px">
+          <div style="font-size:10.5px;color:var(--text3);margin-top:3px">Affects CPF withdrawal limit (lease must cover you to age 95)</div>
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <div class="field-label">Existing Property Using CPF?</div>
+          <select id="cpf-existing-prop" onchange="recalcFunds()" style="font-size:16px">
+            <option value="none">No — this is my first property</option>
+            <option value="yes">Yes — I have an existing CPF-financed property</option>
+          </select>
+          <div style="font-size:10.5px;color:var(--text3);margin-top:3px">Affects OA usage — BRS set-aside required</div>
+        </div>
+      </div>
+
+      <!-- Results panel — shown after inputs -->
+      <div id="funds-results" style="display:none">
+
+        <!-- 3 summary tiles: Cash / CPF / Loan -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+          <div style="background:var(--bg3);border:1px solid rgba(224,92,92,0.3);border-radius:8px;padding:12px">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);font-weight:600;margin-bottom:4px">💵 Cash</div>
+            <div style="font-size:18px;font-weight:600;font-family:'DM Mono',monospace;color:var(--red)" id="funds-cash-avail">—</div>
+            <div style="font-size:10.5px;color:var(--text3);margin-top:3px" id="funds-cash-sub">—</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid rgba(229,162,40,0.3);border-radius:8px;padding:12px">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);font-weight:600;margin-bottom:4px">🏦 CPF OA</div>
+            <div style="font-size:18px;font-weight:600;font-family:'DM Mono',monospace;color:var(--amber)" id="funds-cpf-avail">—</div>
+            <div style="font-size:10.5px;color:var(--text3);margin-top:3px" id="funds-cpf-sub">—</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid rgba(74,159,212,0.3);border-radius:8px;padding:12px">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);font-weight:600;margin-bottom:4px">🏛 Loan</div>
+            <div style="font-size:18px;font-weight:600;font-family:'DM Mono',monospace;color:var(--blue2)" id="funds-loan-tile">—</div>
+            <div style="font-size:10.5px;color:var(--text3);margin-top:3px" id="funds-loan-sub">—</div>
+          </div>
+        </div>
+
+        <!-- CPF Rules section -->
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📋 CPF Withdrawal Limits (MAS / CPF Board)</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11.5px">
+            <div><span style="color:var(--text3)">Valuation Limit (VL)</span><br><span style="font-family:'DM Mono',monospace;color:var(--text);font-weight:600" id="funds-vl">—</span></div>
+            <div><span style="color:var(--text3)">Withdrawal Limit (WL)</span><br><span style="font-family:'DM Mono',monospace;color:var(--text);font-weight:600" id="funds-wl">—</span><span style="font-size:10px;color:var(--text3)"> (120% of VL)</span></div>
+            <div><span style="color:var(--text3)">CPF Usable (downpayment)</span><br><span style="font-family:'DM Mono',monospace;color:var(--teal);font-weight:600" id="funds-cpf-dp">—</span></div>
+            <div><span style="color:var(--text3)">CPF Usable (stamp duties)</span><br><span style="font-family:'DM Mono',monospace;color:var(--teal);font-weight:600" id="funds-cpf-sd">—</span></div>
+          </div>
+          <div id="funds-cpf-warn" style="display:none;margin-top:8px;padding:7px 10px;background:rgba(229,162,40,0.08);border-radius:5px;border-left:2px solid var(--amber);font-size:11px;color:var(--amber);line-height:1.6"></div>
+        </div>
+
+        <!-- Payment order explainer -->
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:600;color:var(--blue2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📐 Payment Order — How Your Money Is Used</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;margin-bottom:8px">
+            <span style="padding:4px 10px;background:rgba(224,92,92,0.12);border:1px solid rgba(224,92,92,0.25);border-radius:5px;color:var(--red);font-weight:600">1. Cash (mandatory min)</span>
+            <span style="color:var(--text3)">→</span>
+            <span style="padding:4px 10px;background:rgba(229,162,40,0.12);border:1px solid rgba(229,162,40,0.25);border-radius:5px;color:var(--amber);font-weight:600">2. CPF OA</span>
+            <span style="color:var(--text3)">→</span>
+            <span style="padding:4px 10px;background:rgba(74,159,212,0.12);border:1px solid rgba(74,159,212,0.25);border-radius:5px;color:var(--blue2);font-weight:600">3. Bank Loan</span>
+          </div>
+          <div id="funds-breakdown-table"></div>
+        </div>
+
+        <!-- Sufficiency check -->
+        <div id="funds-check" style="padding:10px 14px;border-radius:7px;font-size:12px;line-height:1.7"></div>
+      </div>
+
+      <div id="funds-empty" style="font-size:12px;color:var(--text3);padding:8px 0">Enter your Cash on Hand and CPF OA Balance above to see your full funding picture.</div>
+    </div>
+  </div>
+
 
   <!-- LOAN & PROPERTY -->
   <div class="card">
@@ -1056,9 +1150,8 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer;margin-top:
   </div>
 
 
+
   <!-- STAMP DUTY TOGGLES -->
-  <div class="card">
-    <div class="card-header"><span>💰</span><span class="card-title">Downpayment & Payment Schedule</span></div>
     <div class="card-body" id="dp-body" style="overflow-x:auto;-webkit-overflow-scrolling:touch"><div style="color:var(--text3);font-size:13px">Fill in details above.</div></div>
   </div>
 
@@ -1622,6 +1715,9 @@ let buyerCount = 1;
 let _calc = {};
 // User-edited deposit fees — synced between Downpayment card and Timeline
 let _deposit = { optFee: null, exFee: null }; // null = use auto-calculated defaults
+// User-edited date offsets for Transaction Date Planner (resalecondo + hdb only)
+// Keys match milestone index, values are day offsets from the auto-calculated date
+let _dateOffsets = {};
 
 const ABSD = {sc:[0,.20,.30],pr:[.05,.30,.35],foreigner:[.60,.60,.60],entity:[.65,.65,.65]};
 const fmt = n => Math.round(n).toLocaleString('en-SG');
@@ -1689,6 +1785,7 @@ function updateDock(activeId){
 function setPropType(type,el){
   propType=type;
   _deposit = { optFee: null, exFee: null }; // reset when switching property type
+  _dateOffsets = {}; // reset date offsets on property type switch
   document.querySelectorAll('.prop-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
   // Always show dock and clear util tab highlights when a property tab is selected
@@ -2178,6 +2275,7 @@ function calculate(){
 
   // DP schedule
   renderDPSchedule();
+  recalcFunds(); // keep Cash & CPF planner in sync
   // refresh grant calculator if HDB tab
   if(propType==='hdb') calcGrants();
 }
@@ -2277,18 +2375,42 @@ function renderDatePlan(){
     ];
   }
 
+  // For resale condo and HDB — show editable offset inputs per milestone
+  const isEditable = (propType==='resalecondo' || propType==='hdb');
+
   // Render table
-  let html = `<div style="display:flex;flex-direction:column;gap:0">`;
+  let html = '';
+
+  if(isEditable){
+    html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+      <div style="font-size:11px;color:var(--text3)">✎ Click any date offset to customise. Defaults follow standard SG rules.</div>
+      <button onclick="resetDateOffsets()" style="padding:4px 10px;font-size:11px;background:var(--bg4);border:1px solid var(--border);border-radius:5px;color:var(--text3);cursor:pointer;font-family:'DM Sans',sans-serif">↺ Reset to defaults</button>
+    </div>`;
+  }
+
+  html += `<div style="display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden">`;
+
   milestones.forEach((m,i)=>{
     const today = new Date(); today.setHours(0,0,0,0);
-    const daysLeft = Math.round((m.date - today)/(1000*60*60*24));
+    // Apply user offset if set
+    const offset = _dateOffsets[i] || 0;
+    const adjustedDate = addDays(m.date, offset);
+    const daysLeft = Math.round((adjustedDate - today)/(1000*60*60*24));
     const isPast = daysLeft < 0;
     const isUrgent = m.warn && daysLeft >= 0 && daysLeft <= 14;
     const bg = isUrgent ? 'rgba(229,92,92,0.08)' : isPast ? 'rgba(255,255,255,0.02)' : 'transparent';
-    html += `<div class="tl-milestone-row" style="display:grid;grid-template-columns:120px 1fr auto;gap:8px;align-items:start;padding:10px 12px;border-bottom:1px solid var(--border);background:${bg};border-radius:${i===0?'7px 7px 0 0':i===milestones.length-1?'0 0 7px 7px':'0'}">
+
+    html += `<div class="tl-milestone-row" style="display:grid;grid-template-columns:${isEditable?'130px':'120px'} 1fr auto;gap:8px;align-items:start;padding:10px 12px;border-bottom:1px solid var(--border);background:${bg}${i===milestones.length-1?';border-bottom:none':''}">
       <div>
-        <div style="font-size:12px;font-weight:600;color:${m.color};font-family:'DM Mono',monospace">${fmtDate(m.date)}</div>
+        <div style="font-size:12px;font-weight:600;color:${m.color};font-family:'DM Mono',monospace">${fmtDate(adjustedDate)}</div>
         <div style="font-size:10px;color:${isPast?'var(--text3)':isUrgent?'var(--red)':'var(--text3)'};margin-top:2px">${isPast?'Past':'In '+daysLeft+' day'+(daysLeft===1?'':'s')}</div>
+        ${isEditable ? `<div style="display:flex;align-items:center;gap:3px;margin-top:4px">
+          <button onclick="adjustDateOffset(${i},-1)" style="width:18px;height:18px;border-radius:3px;border:1px solid var(--border2);background:var(--bg4);color:var(--text2);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1">−</button>
+          <input type="number" value="${offset}" style="width:36px;text-align:center;padding:2px 3px;background:var(--bg4);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-size:10px;font-family:'DM Mono',monospace;outline:none;min-height:0"
+            oninput="setDateOffset(${i},parseInt(this.value)||0)" title="Days offset from default">
+          <button onclick="adjustDateOffset(${i},1)" style="width:18px;height:18px;border-radius:3px;border:1px solid var(--border2);background:var(--bg4);color:var(--text2);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1">+</button>
+          <span style="font-size:9.5px;color:var(--text3)">days</span>
+        </div>` : ''}
       </div>
       <div>
         <div style="font-size:12.5px;font-weight:500;color:${isPast?'var(--text3)':'var(--text)'}">${m.label}</div>
@@ -2313,6 +2435,19 @@ function renderDatePlan(){
   if(tableEl) tableEl.innerHTML = html;
   if(resEl) resEl.style.display = 'block';
   if(emptyEl) emptyEl.style.display = 'none';
+}
+
+function adjustDateOffset(idx, delta){
+  _dateOffsets[idx] = (_dateOffsets[idx] || 0) + delta;
+  renderDatePlan();
+}
+function setDateOffset(idx, val){
+  _dateOffsets[idx] = val || 0;
+  renderDatePlan();
+}
+function resetDateOffsets(){
+  _dateOffsets = {};
+  renderDatePlan();
 }
 
 function toggleInterest(){
@@ -2434,6 +2569,186 @@ function recalcCondoDep(){
   renderTimeline();
 }
 
+// ═══════════════════════════════════════════
+// CASH & CPF AVAILABILITY PLANNER
+// ═══════════════════════════════════════════
+function recalcFunds(){
+  const cashInput  = parseFloat(document.getElementById('cash-onhand')?.value)||0;
+  const cpfInput   = parseFloat(document.getElementById('cpf-oa-balance')?.value)||0;
+  const lease      = parseInt(document.getElementById('prop-lease')?.value)||99;
+  const existProp  = document.getElementById('cpf-existing-prop')?.value||'none';
+  const resEl      = document.getElementById('funds-results');
+  const emptyEl    = document.getElementById('funds-empty');
+
+  if(!cashInput && !cpfInput){ if(resEl) resEl.style.display='none'; if(emptyEl) emptyEl.style.display='block'; return; }
+  if(resEl) resEl.style.display='block';
+  if(emptyEl) emptyEl.style.display='none';
+
+  const r         = _calc;
+  const price     = r.price||0;
+  const val       = r.val||price;
+  const baseVal   = Math.min(price,val);  // lower of price/valuation
+  const maxLoan   = r.maxLoan||0;
+  const minCash   = r.minCash||0;
+  const totalDP   = r.totalDP||0;
+  const bsd       = r.bsd||0;
+  const absd      = r.absd||0;
+  const loanSrc   = r.loanSrc||'bank';
+  const b1age     = parseInt(document.getElementById('b1-age')?.value)||35;
+  const BRS_2025  = 106500; // CPF BRS 2025
+
+  // ── CPF Rules ──
+  // Valuation Limit (VL) = lower of price or valuation
+  const VL = baseVal;
+  // Withdrawal Limit (WL) = 120% of VL for bank loans (first property)
+  // For HDB loan: no VL/WL restriction on new BTO; for resale VL applies
+  const WL = loanSrc==='hdb' ? VL : Math.round(VL * 1.20);
+
+  // Lease check: must cover youngest buyer to age 95
+  // If lease + buyer age < 95, pro-rate CPF usage
+  const leaseCoversTo95 = (lease + b1age) >= 95;
+  const leaseFraction   = leaseCoversTo95 ? 1 : Math.min(1, (95 - b1age) / Math.max(1, 95 - b1age - (95 - b1age - lease)));
+  // Simplified: if lease doesn't cover to 95, pro-rate VL
+  const effectiveVL = leaseCoversTo95 ? VL : Math.round(VL * ((lease) / Math.max(1, 95 - b1age)));
+  const effectiveWL = leaseCoversTo95 ? WL : Math.round(effectiveVL * (loanSrc==='hdb' ? 1 : 1.20));
+
+  // $20K retention rule: if HDB loan, must retain $20K in OA after withdrawal
+  const retainMin = loanSrc==='hdb' ? 20000 : 0;
+
+  // BRS set-aside if has existing CPF-financed property
+  const brsSetAside = existProp==='yes' ? BRS_2025 : 0;
+
+  // Usable CPF = min(OA balance - retainMin - brsSetAside, effectiveVL)
+  const cpfRaw     = Math.max(0, cpfInput - retainMin - brsSetAside);
+  const cpfUsableDP = Math.min(cpfRaw, Math.max(0, totalDP - minCash)); // for downpayment
+  const cpfUsableSD = Math.min(cpfRaw, bsd + absd); // for stamp duties (from remaining after DP)
+  const totalCPFUsable = Math.min(cpfRaw, effectiveVL);
+
+  // Cash needed checks
+  const cashNeededMin   = minCash;                  // mandatory minimum cash
+  const cashForSD       = Math.max(0, (bsd+absd) - cpfUsableSD); // if not enough CPF for SD
+  const cashAfterUse    = cashInput - cashNeededMin;
+  const cpfAfterDP      = totalCPFUsable - cpfUsableDP;
+
+  // ── Update tiles ──
+  const setEl = (id, txt, col) => {
+    const el = document.getElementById(id);
+    if(el){ el.textContent = txt; if(col) el.style.color = col; }
+  };
+
+  const isShort = cashInput < cashNeededMin;
+  setEl('funds-cash-avail', '$'+fmt(Math.round(cashInput)));
+  setEl('funds-cash-sub',   'Min required: $'+fmt(Math.round(cashNeededMin)) + (isShort ? ' ⚠ SHORT':''), isShort?'var(--red)':'');
+
+  setEl('funds-cpf-avail',  '$'+fmt(Math.round(totalCPFUsable)));
+  setEl('funds-cpf-sub',    'Usable after rules'+(retainMin?' ($'+fmt(retainMin)+' retained)':'')+(brsSetAside?' (BRS set-aside)':''));
+
+  setEl('funds-loan-tile',  '$'+fmt(maxLoan));
+  setEl('funds-loan-sub',   (r.ltvPct*100||75).toFixed(0)+'% LTV · '+r.loanSrc);
+
+  // ── CPF limits ──
+  setEl('funds-vl', '$'+fmt(Math.round(effectiveVL)) + (leaseCoversTo95 ? '' : ' (pro-rated)'));
+  setEl('funds-wl', '$'+fmt(Math.round(effectiveWL)));
+  setEl('funds-cpf-dp', '$'+fmt(Math.round(cpfUsableDP)));
+  setEl('funds-cpf-sd', '$'+fmt(Math.round(cpfUsableSD)));
+
+  // Warnings
+  const warnEl = document.getElementById('funds-cpf-warn');
+  const warns = [];
+  if(!leaseCoversTo95) warns.push('⚠ Lease ('+lease+'yr) + your age ('+b1age+') = '+(lease+b1age)+' — does not reach 95. CPF usage is pro-rated to '+Math.round(effectiveVL/VL*100)+'% of VL.');
+  if(existProp==='yes') warns.push('⚠ Existing CPF-financed property detected — BRS ($'+fmt(BRS_2025)+') must be set aside before using CPF for this purchase.');
+  if(loanSrc==='hdb') warns.push('ℹ HDB Loan: Must retain $20,000 in CPF OA after withdrawal.');
+  if(cpfInput > effectiveWL) warns.push('ℹ Your CPF OA ($'+fmt(cpfInput)+') exceeds WL ($'+fmt(effectiveWL)+'). Only $'+fmt(effectiveWL)+' can be used for this property.');
+  if(warnEl){ warnEl.innerHTML = warns.join('<br>'); warnEl.style.display = warns.length ? 'block':'none'; }
+
+  // ── Payment breakdown table ──
+  const rows = [];
+  if(propType==='newlaunch'){
+    rows.push({stage:'Booking Fee (5%)', total:Math.round(price*.05), cash:Math.round(price*.05), cpf:0, loan:0, note:'Cash only'});
+    rows.push({stage:'S&P Balance (15%)', total:Math.round(price*.15), cash:0, cpf:Math.round(price*.15), loan:0, note:'Cash or CPF OA'});
+    rows.push({stage:'BSD + ABSD', total:bsd+absd, cash:0, cpf:Math.min(totalCPFUsable,bsd+absd), loan:0, note:'CPF OA or cash'});
+    rows.push({stage:'Progressive (bank/CPF)', total:maxLoan+Math.round(price*.40-price*.20), cash:0, cpf:Math.round(price*.40-price*.20), loan:maxLoan, note:'Bank draws progressively'});
+  } else if(propType==='hdb'){
+    const optF = _deposit.optFee!==null?_deposit.optFee:Math.min(1000,Math.round(price*.01));
+    const exF  = _deposit.exFee!==null?_deposit.exFee:Math.min(4000,5000-optF);
+    rows.push({stage:'Option Fee', total:optF, cash:optF, cpf:0, loan:0, note:'Cash only'});
+    rows.push({stage:'Exercise Fee', total:exF, cash:exF, cpf:0, loan:0, note:'Cash only'});
+    rows.push({stage:'BSD', total:bsd, cash:Math.round(bsd*.5), cpf:Math.round(bsd*.5), loan:0, note:'Cash or CPF'});
+    rows.push({stage:'Downpayment (balance)', total:Math.max(0,totalDP-(optF+exF)), cash:Math.max(0,minCash-(optF+exF)), cpf:cpfUsableDP, loan:0, note:'Cash + CPF OA'});
+    rows.push({stage:'Loan drawdown', total:maxLoan, cash:0, cpf:0, loan:maxLoan, note:'HDB / Bank'});
+  } else {
+    const optF = _deposit.optFee!==null?_deposit.optFee:Math.round(price*.01);
+    const exF  = _deposit.exFee!==null?_deposit.exFee:Math.round(price*.04);
+    rows.push({stage:'Option Fee', total:optF, cash:optF, cpf:0, loan:0, note:'Cash only'});
+    rows.push({stage:'Exercise Fee', total:exF, cash:Math.round(exF*.5), cpf:Math.round(exF*.5), loan:0, note:'Cash + CPF OA'});
+    rows.push({stage:'BSD + ABSD', total:bsd+absd, cash:0, cpf:Math.min(totalCPFUsable,bsd+absd), loan:0, note:'CPF OA or cash'});
+    rows.push({stage:'Remaining Downpayment', total:Math.max(0,totalDP-(optF+exF)), cash:Math.max(0,minCash-(optF+exF)), cpf:Math.max(0,cpfUsableDP-(Math.round(exF*.5))), loan:0, note:'Cash + CPF OA'});
+    rows.push({stage:'Loan drawdown', total:maxLoan, cash:0, cpf:0, loan:maxLoan, note:'Bank'});
+  }
+
+  const tbEl = document.getElementById('funds-breakdown-table');
+  if(tbEl){
+    let th = `<table class="ct" style="font-size:11px"><thead><tr>
+      <th>Stage</th>
+      <th style="text-align:right;color:var(--red)">Cash 💵</th>
+      <th style="text-align:right;color:var(--amber)">CPF OA 🏦</th>
+      <th style="text-align:right;color:var(--blue2)">Loan 🏛</th>
+      <th style="color:var(--text3)">Note</th>
+    </tr></thead><tbody>`;
+    rows.forEach(row=>{
+      th+=`<tr>
+        <td style="font-weight:500">${row.stage}</td>
+        <td class="mono" style="text-align:right;color:${row.cash>0?'var(--red)':'var(--text3)'}">$${fmt(Math.round(row.cash))}</td>
+        <td class="mono" style="text-align:right;color:${row.cpf>0?'var(--amber)':'var(--text3)'}">$${fmt(Math.round(row.cpf))}</td>
+        <td class="mono" style="text-align:right;color:${row.loan>0?'var(--blue2)':'var(--text3)'}">$${fmt(Math.round(row.loan))}</td>
+        <td style="font-size:10.5px;color:var(--text3)">${row.note}</td>
+      </tr>`;
+    });
+    const totCash = rows.reduce((a,r)=>a+r.cash,0);
+    const totCPF  = rows.reduce((a,r)=>a+r.cpf,0);
+    const totLoan = rows.reduce((a,r)=>a+r.loan,0);
+    th+=`<tr style="font-weight:700;border-top:2px solid var(--border2)">
+      <td>TOTAL</td>
+      <td class="mono" style="text-align:right;color:var(--red)">$${fmt(Math.round(totCash))}</td>
+      <td class="mono" style="text-align:right;color:var(--amber)">$${fmt(Math.round(totCPF))}</td>
+      <td class="mono" style="text-align:right;color:var(--blue2)">$${fmt(Math.round(totLoan))}</td>
+      <td></td>
+    </tr></tbody></table>`;
+    tbEl.innerHTML = th;
+  }
+
+  // ── Sufficiency check ──
+  const checkEl = document.getElementById('funds-check');
+  if(checkEl){
+    const totalNeeded   = price + bsd + absd;
+    const totalAvailable= cashInput + totalCPFUsable + maxLoan;
+    const shortfall     = Math.max(0, totalNeeded - totalAvailable);
+    const cashShortfall = Math.max(0, cashNeededMin - cashInput);
+    const cpfShortfall  = Math.max(0, cpfUsableDP - cpfRaw);
+
+    if(cashShortfall > 0){
+      checkEl.style.background = 'rgba(224,92,92,0.08)';
+      checkEl.style.border = '1px solid rgba(224,92,92,0.25)';
+      checkEl.style.color = 'var(--red)';
+      checkEl.innerHTML = `⚠ <strong>Cash shortfall of $${fmt(Math.round(cashShortfall))}</strong> — you need at least $${fmt(Math.round(cashNeededMin))} cash for the mandatory portion. Your current cash on hand ($${fmt(Math.round(cashInput))}) is insufficient.`;
+    } else if(shortfall > 0){
+      checkEl.style.background = 'rgba(229,162,40,0.08)';
+      checkEl.style.border = '1px solid rgba(229,162,40,0.25)';
+      checkEl.style.color = 'var(--amber)';
+      checkEl.innerHTML = `⚠ <strong>Overall shortfall of $${fmt(Math.round(shortfall))}</strong> — total funds (cash + CPF + loan) of $${fmt(Math.round(totalAvailable))} fall short of total cost $${fmt(Math.round(totalNeeded))}.`;
+    } else {
+      checkEl.style.background = 'rgba(76,175,125,0.08)';
+      checkEl.style.border = '1px solid rgba(76,175,125,0.25)';
+      checkEl.style.color = 'var(--green)';
+      checkEl.innerHTML = `✓ <strong>Funds look sufficient.</strong> Total available: $${fmt(Math.round(totalAvailable))} (cash $${fmt(Math.round(cashInput))} + CPF $${fmt(Math.round(totalCPFUsable))} + loan $${fmt(Math.round(maxLoan))}) vs total cost $${fmt(Math.round(totalNeeded))}.`;
+    }
+    checkEl.style.borderRadius = '7px';
+    checkEl.style.padding = '10px 14px';
+    checkEl.style.fontSize = '11.5px';
+    checkEl.style.lineHeight = '1.7';
+  }
+}
+
 function renderDPSchedule(){
   const r=_calc;
   if(!r.price) return;
@@ -2499,7 +2814,7 @@ function renderDPSchedule(){
       </button>
 
       <div style="display:none;margin-top:12px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px">
-        <div style="font-size:12px;font-weight:600;color:var(--blue2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">📊 Monthly Instalment — Principal + Interest — ${(rate*100).toFixed(2)}% p.a. · ${tenure}yr tenure</div>
+        <div style="font-size:12px;font-weight:600;color:var(--blue2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">📊 Monthly Instalment During Construction — P+I at ${(rate*100).toFixed(2)}% p.a. · ${tenure}yr tenure</div>
 
         <div class="deposit-edit-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
           <div class="stat-tile"><div class="stat-label">Full Monthly Instalment</div><div class="stat-value" style="color:var(--green)">$${fmt(monthly)}</div><div class="stat-sub">After CSC — full loan disbursed</div></div>
@@ -2507,7 +2822,7 @@ function renderDPSchedule(){
         </div>
 
         <div style="font-size:11.5px;color:var(--text2);margin-bottom:10px;line-height:1.7">
-          As the bank disburses each tranche, you immediately begin paying <strong style="color:var(--teal)">principal + interest (P+I)</strong> on the disbursed amount over the full remaining tenure. Your monthly payment grows with each milestone until CSC when the full instalment kicks in.
+          From the first disbursement, you pay <strong style="color:var(--teal)">principal + interest (P+I)</strong> on the disbursed amount — calculated over your full ${tenure}-year tenure. Your monthly commitment grows progressively with each construction milestone, reaching the full amount only after CSC.
         </div>
 
         <table class="ct ct-instalment" style="font-size:11.5px;table-layout:fixed;width:100%">
@@ -2722,12 +3037,15 @@ function renderTimeline(){
 // COSTS BREAKDOWN
 // ═══════════════════════════
 function toggleMiscSection(){
-  const rows = document.getElementById('misc-rows');
   const icon = document.getElementById('misc-toggle-icon');
-  if(!rows || !icon) return;
-  const isHidden = rows.style.display === 'none';
-  rows.style.display = isHidden ? '' : 'none';
+  // Use .misc-item class on rows — avoids invalid nested tbody
+  const miscItems = document.querySelectorAll('#costs-body .misc-item');
+  if(!miscItems.length || !icon) return;
+  const isHidden = miscItems[0].style.display === 'none';
+  miscItems.forEach(row => row.style.display = isHidden ? '' : 'none');
   icon.textContent = isHidden ? '▼ hide' : '▶ show';
+  // Recalculate total — misc items excluded when hidden
+  updateCostTotal();
 }
 
 function renderCosts(){
@@ -2753,74 +3071,76 @@ function renderCosts(){
 
   const totalFixed=bsd+absd+defaults.lawyer+defaults.mlegal+defaults.val+(isNewL?0:defaults.agent+defaults.agentGST)+defaults.mcst+defaults.fire;
 
-  const stageData=calcStages(r,defaults);
-
   let h=`
-  <table class="ct">
-    <thead><tr><th>Cost Item</th><th>Amount (SGD)</th><th>Timing</th><th>Type</th><th>Notes</th></tr></thead>
+  <table class="ct" style="table-layout:fixed;width:100%">
+    <colgroup>
+      <col style="width:48%">
+      <col style="width:22%">
+      <col style="width:30%">
+    </colgroup>
+    <thead><tr>
+      <th>Cost Item</th>
+      <th style="text-align:right">Amount (SGD)</th>
+      <th>When / Source</th>
+    </tr></thead>
     <tbody>
-    <tr><td colspan="5" style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:10px 11px 4px;background:var(--bg4)">STAMP DUTIES</td></tr>
-    <tr><td>Buyer Stamp Duty (BSD)</td><td class="mono">$${fmt(bsd)}</td><td>14 days of OTP exercise</td><td><span class="tag tag-req">Mandatory</span></td><td>CPF or cash</td></tr>
-    <tr><td>ABSD</td><td class="mono">$${fmt(absd)}</td><td>14 days of OTP exercise</td><td><span class="tag ${absd>0?'tag-req':'tag-opt'}">${absd>0?'Mandatory':'N/A'}</span></td><td>Based on profile</td></tr>
-
-    <tr><td colspan="5" style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:10px 11px 4px;background:var(--bg4)">LEGAL & PROFESSIONAL FEES</td></tr>
-    <tr><td>Conveyancing / Legal Fees (Buyer)</td>
-        <td><input class="editable-input" type="number" id="c-lawyer" value="${defaults.lawyer}" oninput="updateCostTotal()"></td>
-        <td>Completion</td><td><span class="tag tag-req">Required</span></td><td>Incl. disbursements, title searches, GST</td></tr>
-    <tr><td>Mortgage Legal Fees (Bank's lawyer)</td>
-        <td><input class="editable-input" type="number" id="c-mlegal" value="${defaults.mlegal}" oninput="updateCostTotal()"></td>
-        <td>Completion</td><td><span class="tag ${maxLoan>0?'tag-req':'tag-opt'}">${maxLoan>0?'Required':'No loan'}</span></td><td>Bank appoints own solicitors</td></tr>
-    <tr><td>Bank Valuation Fee</td>
-        <td><input class="editable-input" type="number" id="c-val" value="${defaults.val}" oninput="updateCostTotal()"></td>
-        <td>Before exercise</td><td><span class="tag tag-var">Variable</span></td><td>${isHDB?'HDB portal — $120 fixed':'Paid to bank\'s appointed valuer'}</td></tr>
-
-    ${!isNewL?`
-    <tr><td colspan="5" style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:10px 11px 4px;background:var(--bg4)">AGENT FEES</td></tr>
-    <tr><td>Agent Commission</td>
-        <td><input class="editable-input" type="number" id="c-agent" value="${defaults.agent}" oninput="updateCostTotal()"></td>
-        <td>Completion</td><td><span class="tag tag-var">Negotiable</span></td><td>Typically 1% of price. New launch: developer pays.</td></tr>
-    <tr><td>GST on agent commission (9%)</td>
-        <td><input class="editable-input" type="number" id="c-agentgst" value="${defaults.agentGST}" oninput="updateCostTotal()"></td>
-        <td>Completion</td><td><span class="tag tag-var">Negotiable</span></td><td>GST payable on top of commission</td></tr>
-    `:''}
-
-    <tr id="misc-toggle-row" onclick="toggleMiscSection()" style="cursor:pointer">
-      <td colspan="5" style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:10px 11px 4px;background:var(--bg4);user-select:none">
-        <span>MISCELLANEOUS / UPFRONT COSTS</span>
-        <span id="misc-toggle-icon" style="float:right;font-size:13px;color:var(--blue2)">▼ hide</span>
+    <tr><td colspan="3" class="ct-section-hdr">STAMP DUTIES</td></tr>
+    <tr>
+      <td>Buyer Stamp Duty (BSD)</td>
+      <td class="mono" style="text-align:right">$${fmt(bsd)}</td>
+      <td><span class="tag tag-req">Mandatory</span><br><span class="ct-note">14 days of OTP · CPF or cash</span></td>
+    </tr>
+    <tr>
+      <td>ABSD</td>
+      <td class="mono" style="text-align:right">$${fmt(absd)}</td>
+      <td><span class="tag ${absd>0?'tag-req':'tag-opt'}">${absd>0?'Mandatory':'N/A'}</span><br><span class="ct-note">Based on buyer profile</span></td>
+    </tr>
+    <tr><td colspan="3" class="ct-section-hdr">LEGAL & PROFESSIONAL FEES</td></tr>
+    <tr>
+      <td>Conveyancing / Legal Fees<br><span class="ct-note">Incl. disbursements, title searches, GST</span></td>
+      <td style="text-align:right"><input class="editable-input" type="number" id="c-lawyer" value="${defaults.lawyer}" oninput="updateCostTotal()"></td>
+      <td><span class="tag tag-req">Required</span><br><span class="ct-note">At completion</span></td>
+    </tr>
+    <tr>
+      <td>Mortgage Legal Fees (bank's lawyer)<br><span class="ct-note">Bank appoints own solicitors</span></td>
+      <td style="text-align:right"><input class="editable-input" type="number" id="c-mlegal" value="${defaults.mlegal}" oninput="updateCostTotal()"></td>
+      <td><span class="tag ${maxLoan>0?'tag-req':'tag-opt'}">${maxLoan>0?'Required':'No loan'}</span><br><span class="ct-note">At completion</span></td>
+    </tr>
+    <tr>
+      <td>Bank Valuation Fee<br><span class="ct-note">${isHDB?'HDB portal — $120 fixed':'Bank\'s appointed valuer'}</span></td>
+      <td style="text-align:right"><input class="editable-input" type="number" id="c-val" value="${defaults.val}" oninput="updateCostTotal()"></td>
+      <td><span class="tag tag-var">Variable</span><br><span class="ct-note">Before exercise</span></td>
+    </tr>
+    ${!isNewL?`<tr><td colspan="3" class="ct-section-hdr">AGENT FEES</td></tr>
+    <tr>
+      <td>Agent Commission<br><span class="ct-note">Typically 1% of price</span></td>
+      <td style="text-align:right"><input class="editable-input" type="number" id="c-agent" value="${defaults.agent}" oninput="updateCostTotal()"></td>
+      <td><span class="tag tag-var">Negotiable</span><br><span class="ct-note">At completion</span></td>
+    </tr>
+    <tr>
+      <td>GST on commission (9%)<br><span class="ct-note">On top of agent commission</span></td>
+      <td style="text-align:right"><input class="editable-input" type="number" id="c-agentgst" value="${defaults.agentGST}" oninput="updateCostTotal()"></td>
+      <td><span class="tag tag-var">Negotiable</span><br><span class="ct-note">At completion</span></td>
+    </tr>`:''}<tr id="misc-toggle-row" onclick="toggleMiscSection()" style="cursor:pointer;user-select:none">
+      <td colspan="3" class="ct-section-hdr" style="cursor:pointer">
+        MISCELLANEOUS / UPFRONT COSTS
+        <span id="misc-toggle-icon" style="float:right;color:var(--blue2)">▼ hide</span>
       </td>
     </tr>
-    <tbody id="misc-rows">
-    ${isHDB?`<tr><td>HDB Resale Portal Admin Fee</td>
-        <td><input class="editable-input" type="number" id="c-hdbadmin" value="160" oninput="updateCostTotal()"></td>
-        <td>Upon submission</td><td><span class="tag tag-req">Required</span></td><td>$80 buyer + $80 seller (each party pays own)</td></tr>`:''}
-    ${!isHDB&&!isLanded?`<tr><td>MCST Move-in Deposit (refundable)</td>
-        <td><input class="editable-input" type="number" id="c-mcst" value="${defaults.mcst}" oninput="updateCostTotal()"></td>
-        <td>Before moving in</td><td><span class="tag tag-opt">Refundable</span></td><td>Returned when unit vacated</td></tr>`:''}
-    <tr><td>Fire Insurance (first year)</td>
-        <td><input class="editable-input" type="number" id="c-fire" value="${defaults.fire}" oninput="updateCostTotal()"></td>
-        <td>Annual</td><td><span class="tag tag-req">Mandatory</span></td><td>Required under mortgage terms</td></tr>
-    <tr><td>Home Contents / Buildings Insurance</td>
-        <td><input class="editable-input" type="number" id="c-home" value="${defaults.homeIns}" oninput="updateCostTotal()"></td>
-        <td>Annual</td><td><span class="tag tag-opt">Recommended</span></td><td>${isLanded?'Buildings insurance essential for landed':'Covers contents loss/damage'}</td></tr>
-    <tr><td>Movers / Relocation</td>
-        <td><input class="editable-input" type="number" id="c-movers" value="${defaults.movers}" oninput="updateCostTotal()"></td>
-        <td>Move-in</td><td><span class="tag tag-var">Variable</span></td><td>Estimate only; varies by volume</td></tr>
-    <tr><td>Utility Deposits (SP Group)</td>
-        <td><input class="editable-input" type="number" id="c-utils" value="${defaults.utilities}" oninput="updateCostTotal()"></td>
-        <td>Before occupation</td><td><span class="tag tag-var">Refundable</span></td><td>Electricity + water deposit</td></tr>
-    <tr><td>Renovation Budget (estimate)</td>
-        <td><input class="editable-input" type="number" id="c-reno" value="${defaults.reno}" oninput="updateCostTotal()"></td>
-        <td>Post-completion</td><td><span class="tag tag-opt">Optional</span></td><td>Highly variable. ${isHDB?'HDB reno permit required.':isLanded?'A&A requires URA/BCA approval.':'MCST reno approval required.'}</td></tr>
-
-    </tbody>
-    <tr style="background:rgba(200,169,110,0.05)">
-      <td style="font-weight:600;color:var(--text);font-size:13.5px">TOTAL ONE-TIME COSTS (excl. reno)</td>
-      <td id="cost-total" colspan="4" style="font-weight:600;font-family:'DM Mono',monospace;color:var(--gold);font-size:15px">Calculating...</td>
+${isHDB?`<tr class="misc-item"><td>HDB Portal Admin Fee<br><span class="ct-note">$80 buyer + $80 seller</span></td><td style="text-align:right"><input class="editable-input" type="number" id="c-hdbadmin" value="160" oninput="updateCostTotal()"></td><td><span class="tag tag-req">Required</span><br><span class="ct-note">Upon submission</span></td></tr>`:''}
+${!isHDB&&!isLanded?`<tr class="misc-item"><td>MCST Move-in Deposit<br><span class="ct-note">Refunded on vacating</span></td><td style="text-align:right"><input class="editable-input" type="number" id="c-mcst" value="${defaults.mcst}" oninput="updateCostTotal()"></td><td><span class="tag tag-opt">Refundable</span><br><span class="ct-note">Before move-in</span></td></tr>`:''}
+    <tr class="misc-item"><td>Fire Insurance (first year)<br><span class="ct-note">Mandatory under mortgage</span></td><td style="text-align:right"><input class="editable-input" type="number" id="c-fire" value="${defaults.fire}" oninput="updateCostTotal()"></td><td><span class="tag tag-req">Mandatory</span><br><span class="ct-note">Annual</span></td></tr>
+    <tr class="misc-item"><td>Home Contents / Buildings Insurance<br><span class="ct-note">${isLanded?'Buildings insurance essential':'Covers contents loss/damage'}</span></td><td style="text-align:right"><input class="editable-input" type="number" id="c-home" value="${defaults.homeIns}" oninput="updateCostTotal()"></td><td><span class="tag tag-opt">Recommended</span><br><span class="ct-note">Annual</span></td></tr>
+    <tr class="misc-item"><td>Movers / Relocation<br><span class="ct-note">Estimate; varies by volume</span></td><td style="text-align:right"><input class="editable-input" type="number" id="c-movers" value="${defaults.movers}" oninput="updateCostTotal()"></td><td><span class="tag tag-var">Variable</span><br><span class="ct-note">Move-in</span></td></tr>
+    <tr class="misc-item"><td>SP Group Utility Deposits<br><span class="ct-note">Electricity + water (refundable)</span></td><td style="text-align:right"><input class="editable-input" type="number" id="c-utils" value="${defaults.utilities}" oninput="updateCostTotal()"></td><td><span class="tag tag-var">Refundable</span><br><span class="ct-note">Before occupation</span></td></tr>
+    <tr class="misc-item"><td>Renovation Budget<br><span class="ct-note">${isHDB?'HDB permit required':isLanded?'URA/BCA approval needed':'MCST approval required'}</span></td><td style="text-align:right"><input class="editable-input" type="number" id="c-reno" value="${defaults.reno}" oninput="updateCostTotal()"></td><td><span class="tag tag-opt">Optional</span><br><span class="ct-note">Post-completion</span></td></tr>
+    <tr style="background:rgba(200,169,110,0.08)">
+      <td style="font-weight:700;color:var(--text)">TOTAL ONE-TIME COSTS <span style="font-weight:400;font-size:11px;color:var(--text3)">(excl. reno)</span></td>
+      <td id="cost-total" style="text-align:right;font-weight:700;font-family:'DM Mono',monospace;color:var(--gold);font-size:15px" colspan="2">Calculating...</td>
     </tr>
-    <tr style="background:rgba(200,169,110,0.03)">
+    <tr style="background:rgba(200,169,110,0.04)">
       <td style="font-weight:500;color:var(--text2)">TOTAL incl. renovation</td>
-      <td id="cost-total-reno" colspan="4" style="font-weight:500;font-family:'DM Mono',monospace;color:var(--amber)">Calculating...</td>
+      <td id="cost-total-reno" style="text-align:right;font-weight:600;font-family:'DM Mono',monospace;color:var(--amber)" colspan="2">Calculating...</td>
     </tr>
     </tbody>
   </table>
@@ -2840,19 +3160,6 @@ function renderCosts(){
     el.addEventListener('blur',()=>{ const n=parseFloat(el.value.replace(/,/g,'')); if(!isNaN(n)) el.value=n.toLocaleString('en-SG'); updateCostTotal(); });
     el.addEventListener('input',()=>{ el.value=el.value.replace(/[^0-9]/g,''); updateCostTotal(); });
   });
-
-  // Stages breakdown
-  let sh=`<div style="font-size:12px;color:var(--text3);margin-bottom:12px">When you need the cash — by transaction stage</div>
-  <table class="ct"><thead><tr><th>Stage</th><th>Cash Required</th><th>CPF Usable</th><th>Loan / Bank</th></tr></thead><tbody>`;
-  stageData.forEach(s=>{
-    sh+=`<tr><td style="font-weight:500;color:var(--text)">${s.name}</td><td class="mono" style="color:var(--red)">$${fmt(s.cash)}</td><td class="mono" style="color:var(--gold)">$${fmt(s.cpf)}</td><td class="mono" style="color:var(--blue2)">$${fmt(s.loan)}</td></tr>`;
-  });
-  const totC=stageData.reduce((a,s)=>a+s.cash,0);
-  const totCPF=stageData.reduce((a,s)=>a+s.cpf,0);
-  const totL=stageData.reduce((a,s)=>a+s.loan,0);
-  sh+=`<tr style="font-weight:600;color:var(--text)"><td>TOTAL</td><td class="mono" style="color:var(--red)">$${fmt(totC)}</td><td class="mono" style="color:var(--gold)">$${fmt(totCPF)}</td><td class="mono" style="color:var(--blue2)">$${fmt(totL)}</td></tr>`;
-  sh+='</tbody></table>';
-  document.getElementById('costs-stages').innerHTML=sh;
 }
 
 function calcStages(r,d){
@@ -2887,15 +3194,65 @@ function calcStages(r,d){
 function updateCostTotal(){
   const r=_calc||{};
   const bsd=r.bsd||0,absd=r.absd||0;
-  const ids=['c-lawyer','c-mlegal','c-val','c-agent','c-agentgst','c-mcst','c-fire','c-home','c-movers','c-utils','c-hdbadmin'];
+  // Fixed fees — always included
+  const fixedIds=['c-lawyer','c-mlegal','c-val','c-agent','c-agentgst'];
+  // Misc fees — only included when misc section is visible
+  const miscIds=['c-mcst','c-fire','c-home','c-movers','c-utils','c-hdbadmin'];
+  const miscItems = document.querySelectorAll('#costs-body .misc-item');
+  const miscHidden = miscItems.length > 0 && miscItems[0].style.display === 'none';
+
+  // Helper — read a live input value by id
+  const getLive = id => {
+    const el = document.getElementById(id);
+    if(!el) return 0;
+    return parseFloat(el.value.replace(/,/g,''))||0;
+  };
+
   let subtotal=bsd+absd;
   let reno=0;
-  ids.forEach(id=>{const el=document.getElementById(id);if(el)subtotal+=parseFloat(el.value.replace(/,/g,''))||0;});
-  const renoEl=document.getElementById('c-reno');
-  if(renoEl)reno=parseFloat(renoEl.value.replace(/,/g,''))||0;
+  fixedIds.forEach(id=>{ subtotal+=getLive(id); });
+  if(!miscHidden){
+    miscIds.forEach(id=>{ subtotal+=getLive(id); });
+  }
+  if(!miscHidden) reno=getLive('c-reno');
+
+  const miscNote = miscHidden?' (excl. misc)':'';
   const el1=document.getElementById('cost-total'),el2=document.getElementById('cost-total-reno');
-  if(el1)el1.textContent='$'+fmt(Math.round(subtotal));
-  if(el2)el2.textContent='$'+fmt(Math.round(subtotal+reno));
+  if(el1) el1.textContent='$'+fmt(Math.round(subtotal))+miscNote;
+  if(el2) el2.textContent='$'+fmt(Math.round(subtotal+reno))+miscNote;
+
+  // ── Rebuild stages table from LIVE inputs ──
+  // Build a live 'd' object from what's currently in the inputs
+  const liveDefs = {
+    lawyer:   getLive('c-lawyer'),
+    mlegal:   getLive('c-mlegal'),
+    val:      getLive('c-val'),
+    agent:    getLive('c-agent'),
+    agentGST: getLive('c-agentgst'),
+    mcst:     miscHidden ? 0 : getLive('c-mcst'),
+    fire:     miscHidden ? 0 : getLive('c-fire'),
+    homeIns:  miscHidden ? 0 : getLive('c-home'),
+    movers:   miscHidden ? 0 : getLive('c-movers'),
+    utilities:miscHidden ? 0 : getLive('c-utils'),
+    hdbAdmin: miscHidden ? 0 : getLive('c-hdbadmin'),
+    reno:     miscHidden ? 0 : reno,
+  };
+
+  const stagesEl = document.getElementById('costs-stages');
+  if(!stagesEl) return;
+
+  const stageData = calcStages(r, liveDefs);
+  let sh=`<div style="font-size:12px;color:var(--text3);margin-bottom:12px">When you need the cash — by transaction stage</div>
+  <table class="ct"><thead><tr><th>Stage</th><th>Cash Required</th><th>CPF Usable</th><th>Loan / Bank</th></tr></thead><tbody>`;
+  stageData.forEach(s=>{
+    sh+=`<tr><td style="font-weight:500;color:var(--text)">${s.name}</td><td class="mono" style="color:var(--red)">$${fmt(s.cash)}</td><td class="mono" style="color:var(--gold)">$${fmt(s.cpf)}</td><td class="mono" style="color:var(--blue2)">$${fmt(s.loan)}</td></tr>`;
+  });
+  const totC=stageData.reduce((a,s)=>a+s.cash,0);
+  const totCPF=stageData.reduce((a,s)=>a+s.cpf,0);
+  const totL=stageData.reduce((a,s)=>a+s.loan,0);
+  sh+=`<tr style="font-weight:600;color:var(--text)"><td>TOTAL</td><td class="mono" style="color:var(--red)">$${fmt(totC)}</td><td class="mono" style="color:var(--gold)">$${fmt(totCPF)}</td><td class="mono" style="color:var(--blue2)">$${fmt(totL)}</td></tr>`;
+  sh+='</tbody></table>';
+  stagesEl.innerHTML=sh;
 }
 
 // ═══════════════════════════
@@ -3314,10 +3671,21 @@ function renderNewLaunchFlow(){
   h+=divider(c2,'Step 3 — Sign S&P & Stamp Duties');
   h+=stageCard(3,c2,'Sign Sales & Purchase Agreement','Within 8 weeks of booking',[{label:'15% Balance (Cash/CPF)',val:`$${fmt(sp)}`,sub:'Brings total paid to 20%',cls:'gold'},{label:'BSD + ABSD Due',val:`$${fmt(bsd+absd)}`,sub:'Within 14 days of S&P date',cls:'red'}],'Lawyer reviews the S&P Agreement. You must sign within 8 weeks of the booking date or forfeit the full 5% booking fee. Pay 15% (bringing total deposit to 20%). BSD and ABSD are due within 14 days of the S&P date — your lawyer will handle payment via IRAS.','Missing the 8-week S&P signing window = full 5% booking fee forfeited. Missing the 14-day stamp duty window = IRAS penalty up to 4× the duty.','Use CPF OA for the stamp duties if you have sufficient balance — conserve cash for the progressive payments ahead.');
   h+=divider(c4,'Step 4 — Progressive Construction Payments');
-  h+=stageCard(4,c4,'Progressive Payment Scheme (PPS) — Construction Milestones','1–4 years (varies by project)',[{label:'Foundation',val:`$${fmt(Math.round(price*.10))}`,sub:'10% — bank/CPF',cls:'teal'},{label:'Framework',val:`$${fmt(Math.round(price*.10))}`,sub:'10% — bank/CPF',cls:'teal'},{label:'Walls & Ceiling',val:`$${fmt(Math.round(price*.05))}`,sub:'5% — bank/CPF',cls:'teal'},{label:'Doors & Windows',val:`$${fmt(Math.round(price*.05))}`,sub:'5% — bank/CPF',cls:'teal'}],'Bank releases loan tranches progressively as each milestone is certified by the developer\'s architect. Interest on the disbursed amount begins immediately — this is your BUC (Building Under Construction) loan. You may also be paying rent elsewhere during this period. Check if your bank offers a Deferred Payment Scheme (DPS) where interest is capitalised instead of monthly payments.','DPS adds total loan cost as interest is capitalised. Run the numbers carefully before choosing DPS over progressive interest payments.','Monitor construction progress. Developers must provide written updates. Keep a copy of all milestone payment receipts.');
-  h+=stageCard('4b',c4,'Car Park, Roads & Drains — Notice of Vacant Possession','Upon TOP',[{label:'Car Park etc.',val:`$${fmt(Math.round(price*.05))}`,sub:'5% — bank/CPF',cls:'teal'},{label:'NVP Payment',val:`$${fmt(Math.round(price*.25))}`,sub:'25% — bank/CPF',cls:'gold'}],'Developer obtains Temporary Occupation Permit (TOP) and issues Notice of Vacant Possession (NVP). Unit is ready for handover. Inspect the unit thoroughly — submit your defect list within 7 days of NVP. Developer must rectify all defects within the 1-year Defects Liability Period (DLP).','Never skip the defect inspection. Document everything with photos and video with timestamps. Verbal acknowledgements are not sufficient.','Arrange your renovation contractor and interior designer before TOP so you can start reno immediately after defect rectification.');
-  h+=divider(c5,'Step 5 — Certificate of Statutory Completion');
-  h+=stageCard(5,c5,'CSC Issued — Final Payment & Full Title','3–12 months after TOP',[{label:'Final 15% Payment',val:`$${fmt(Math.round(price*.15))}`,sub:'Bank drawdown — full loan disbursed',cls:'green'},{label:'SSD Period Starts',val:'4 years',sub:'16%/12%/8%/4% — from 4 Jul 2025',cls:'red'}],'Developer obtains Certificate of Statutory Completion from BCA. Final 15% payment triggered. Full bank loan is disbursed. Strata title issued. MCST (Management Corporation Strata Title) formed — monthly management fees commence. This date marks the start of your SSD holding period (4 years for properties bought from 4 Jul 2025; 3 years if bought before).','If you sell within 4 years of the CSC date (bought from 4 Jul 2025): Year 1 = 16%, Year 2 = 12%, Year 3 = 8%, Year 4 = 4% SSD. This is significant on a high-value property.','Review your mortgage interest rate after the lock-in period (typically 2–3 years from first drawdown) for refinancing opportunities.');
+  h+=stageCard(4,c4,'Progressive Construction Payments (PPS) — All 6 Milestones','1–4 years (varies by project)',[
+    {label:'Foundation',val:`$${fmt(Math.round(price*.10))}`,sub:'10% of price — bank/CPF',cls:'teal'},
+    {label:'RC Framework',val:`$${fmt(Math.round(price*.10))}`,sub:'10% of price — bank/CPF',cls:'teal'},
+    {label:'Partition / Brick Walls',val:`$${fmt(Math.round(price*.05))}`,sub:'5% of price — bank/CPF',cls:'teal'},
+    {label:'Ceiling Completion',val:`$${fmt(Math.round(price*.05))}`,sub:'5% of price — bank/CPF',cls:'teal'},
+    {label:'Doors, Windows, Plumbing, Wiring',val:`$${fmt(Math.round(price*.05))}`,sub:'5% of price — bank/CPF',cls:'teal'},
+    {label:'Car Park, Roads & Drains',val:`$${fmt(Math.round(price*.05))}`,sub:'5% of price — bank/CPF',cls:'teal'}
+  ],'Bank releases loan tranches progressively as each milestone is certified by the developer\'s architect. Each of the 6 stages above triggers a disbursement. Interest on the disbursed amount begins immediately — this is your BUC (Building Under Construction) loan. These 6 stages total 40% of the price (bank/CPF). You may also be paying rent elsewhere during this 1–4 year period.','Each stage triggers immediate P+I payments on the disbursed amount. Missing the S&P deadline (8 weeks) forfeits the full 5% booking fee. Monitor construction progress via developer updates.','Keep a copy of all architect\'s certificates and milestone payment receipts. Request written updates from the developer every quarter.');
+  h+=divider(c5,'Step 5 — TOP / Notice of Vacant Possession');
+  h+=stageCard('4b',c5,'TOP Issued — Notice of Vacant Possession (NVP)','Upon TOP',[
+    {label:'NVP Payment (25%)',val:`$${fmt(Math.round(price*.25))}`,sub:'25% of price — bank/CPF',cls:'gold'},
+    {label:'Defect Liability Period',val:'1 year',sub:'Submit defect list within 7 days',cls:'teal'}
+  ],'Developer obtains Temporary Occupation Permit (TOP) from BCA and issues Notice of Vacant Possession (NVP). This triggers the 25% payment. Unit is ready for handover and renovation. Inspect the unit thoroughly — submit your defect list within 7 days. Developer must rectify all defects within the 1-year Defects Liability Period (DLP). You can begin renovation immediately after receiving keys.','Never skip the defect inspection. Document everything with photos and video with timestamps. Verbal acknowledgements are not sufficient.','Arrange your renovation contractor and interior designer before TOP so you can start immediately after defect rectification. Lift-booking deposit required by MCST.');
+  h+=divider(c6,'Step 6 — Certificate of Statutory Completion');
+  h+=stageCard(6,c6,'CSC Issued — Final Payment & Full Title','3–12 months after TOP',[{label:'Final 15% Payment',val:`$${fmt(Math.round(price*.15))}`,sub:'Bank drawdown — full loan disbursed',cls:'green'},{label:'SSD Period Starts',val:'4 years',sub:'16%/12%/8%/4% — from 4 Jul 2025',cls:'red'}],'Developer obtains Certificate of Statutory Completion from BCA. Final 15% payment triggered. Full bank loan is disbursed. Strata title issued. MCST (Management Corporation Strata Title) formed — monthly management fees commence. This date marks the start of your SSD holding period (4 years for properties bought from 4 Jul 2025; 3 years if bought before).','If you sell within 4 years of the CSC date (bought from 4 Jul 2025): Year 1 = 16%, Year 2 = 12%, Year 3 = 8%, Year 4 = 4% SSD. This is significant on a high-value property.','Review your mortgage interest rate after the lock-in period (typically 2–3 years from first drawdown) for refinancing opportunities.');
   h+=divider(c6,'Post-Purchase — Ownership Obligations');
   h+=stageCard('★',c6,'Ongoing Ownership Obligations','Ongoing',[{label:'Monthly Mortgage',val:`$${fmt(monthly)}/mo`,sub:'CPF + cash GIRO',cls:'green'},{label:'MCST Fees',val:'~$200–500/mo',sub:'Varies by development',cls:'teal'}],'Annual property tax payable to IRAS (owner-occupier rates). Monthly MCST fees for maintenance of common areas and facilities. Fire insurance mandatory under mortgage. Review refinancing when lock-in period expires. SSD applicable if sold within 4 years of purchase (from 4 Jul 2025): 16%/12%/8%/4%.','Short-term rentals (under 3 consecutive months) are illegal for private residential properties in Singapore. Long-term rental requires MCST tenancy approval at some developments.','Set a calendar reminder 3 months before your mortgage lock-in expires — banks can offer better refinancing packages if you initiate early.');
   h+=`</div>`;
