@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- SG Property Planner v3.5 | 1774184089 | pdf-overhaul -->
+<!-- SG Property Planner v3.8 | 1774189218 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1018,7 +1018,7 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer;margin-top:
   <!-- STAMP DUTY TOGGLES -->
   <div class="card">
     <div class="card-header"><span>💰</span><span class="card-title">Downpayment & Payment Schedule</span></div>
-    <div class="card-body" id="dp-body"><div style="color:var(--text3);font-size:13px">Fill in details above.</div></div>
+    <div class="card-body" id="dp-body" style="overflow-x:auto;-webkit-overflow-scrolling:touch"><div style="color:var(--text3);font-size:13px">Fill in details above.</div></div>
   </div>
 
   <!-- HDB GRANT CALCULATOR — auto-shown when HDB tab active -->
@@ -2432,21 +2432,25 @@ function renderDPSchedule(){
           As the bank disburses each tranche, you immediately begin paying <strong style="color:var(--teal)">principal + interest (P+I)</strong> on the disbursed amount over the full remaining tenure. Your monthly payment grows with each milestone until CSC when the full instalment kicks in.
         </div>
 
-        <table class="ct" style="font-size:11.5px">
+        <table class="ct" style="font-size:11.5px;table-layout:fixed;width:100%">
+          <colgroup>
+            <col style="width:45%">
+            <col style="width:28%">
+            <col style="width:27%">
+          </colgroup>
           <thead><tr>
             <th>Construction Stage</th>
-            <th>Loan Disbursed</th>
-            <th style="color:var(--teal)">P+I Monthly</th>
-            <th>% of Full</th>
+            <th style="text-align:right">Loan Disbursed</th>
+            <th style="text-align:right;color:var(--teal)">Monthly P+I</th>
           </tr></thead>
           <tbody>
-            <tr><td>After Foundation (10%)</td><td class="mono">$${fmt(d1)}</td><td class="mono" style="color:var(--teal);font-weight:600">$${fmt(pmt(d1))}/mo</td><td class="mono" style="color:var(--text3)">${Math.round(pmt(d1)/monthly*100)}%</td></tr>
-            <tr><td>After Framework (+10%)</td><td class="mono">$${fmt(d2)}</td><td class="mono" style="color:var(--teal);font-weight:600">$${fmt(pmt(d2))}/mo</td><td class="mono" style="color:var(--text3)">${Math.round(pmt(d2)/monthly*100)}%</td></tr>
-            <tr><td>After Walls (+5%)</td><td class="mono">$${fmt(d3)}</td><td class="mono" style="color:var(--teal);font-weight:600">$${fmt(pmt(d3))}/mo</td><td class="mono" style="color:var(--text3)">${Math.round(pmt(d3)/monthly*100)}%</td></tr>
-            <tr><td>After Roof/Doors (+5%)</td><td class="mono">$${fmt(d4)}</td><td class="mono" style="color:var(--teal);font-weight:600">$${fmt(pmt(d4))}/mo</td><td class="mono" style="color:var(--text3)">${Math.round(pmt(d4)/monthly*100)}%</td></tr>
-            <tr><td>After Car Park (+5%)</td><td class="mono">$${fmt(d5)}</td><td class="mono" style="color:var(--teal);font-weight:600">$${fmt(pmt(d5))}/mo</td><td class="mono" style="color:var(--text3)">${Math.round(pmt(d5)/monthly*100)}%</td></tr>
-            <tr><td>After NVP (+25%)</td><td class="mono">$${fmt(d6)}</td><td class="mono" style="color:var(--teal);font-weight:600">$${fmt(pmt(d6))}/mo</td><td class="mono" style="color:var(--text3)">${Math.round(pmt(d6)/monthly*100)}%</td></tr>
-            <tr style="background:rgba(76,175,125,0.08)"><td><strong>After CSC (+15%) — Full</strong></td><td class="mono">$${fmt(maxLoan)}</td><td class="mono" style="color:var(--green);font-weight:700">$${fmt(monthly)}/mo</td><td class="mono" style="color:var(--green)">100%</td></tr>
+            <tr><td>Foundation (10%)</td><td class="mono" style="text-align:right">$${fmt(d1)}</td><td class="mono" style="text-align:right;color:var(--teal);font-weight:600">$${fmt(pmt(d1))}/mo</td></tr>
+            <tr><td>Framework (+10%)</td><td class="mono" style="text-align:right">$${fmt(d2)}</td><td class="mono" style="text-align:right;color:var(--teal);font-weight:600">$${fmt(pmt(d2))}/mo</td></tr>
+            <tr><td>Walls (+5%)</td><td class="mono" style="text-align:right">$${fmt(d3)}</td><td class="mono" style="text-align:right;color:var(--teal);font-weight:600">$${fmt(pmt(d3))}/mo</td></tr>
+            <tr><td>Roof / Doors (+5%)</td><td class="mono" style="text-align:right">$${fmt(d4)}</td><td class="mono" style="text-align:right;color:var(--teal);font-weight:600">$${fmt(pmt(d4))}/mo</td></tr>
+            <tr><td>Car Park (+5%)</td><td class="mono" style="text-align:right">$${fmt(d5)}</td><td class="mono" style="text-align:right;color:var(--teal);font-weight:600">$${fmt(pmt(d5))}/mo</td></tr>
+            <tr><td>NVP (+25%)</td><td class="mono" style="text-align:right">$${fmt(d6)}</td><td class="mono" style="text-align:right;color:var(--teal);font-weight:600">$${fmt(pmt(d6))}/mo</td></tr>
+            <tr style="background:rgba(76,175,125,0.08)"><td><strong>CSC — Full Loan (+15%)</strong></td><td class="mono" style="text-align:right">$${fmt(maxLoan)}</td><td class="mono" style="text-align:right;color:var(--green);font-weight:700">$${fmt(monthly)}/mo</td></tr>
           </tbody>
         </table>
 
@@ -2638,6 +2642,15 @@ function renderTimeline(){
 // ═══════════════════════════
 // COSTS BREAKDOWN
 // ═══════════════════════════
+function toggleMiscSection(){
+  const rows = document.getElementById('misc-rows');
+  const icon = document.getElementById('misc-toggle-icon');
+  if(!rows || !icon) return;
+  const isHidden = rows.style.display === 'none';
+  rows.style.display = isHidden ? '' : 'none';
+  icon.textContent = isHidden ? '▼ hide' : '▶ show';
+}
+
 function renderCosts(){
   const r=_calc;
   const price=r.price||1200000,bsd=r.bsd||0,absd=r.absd||0,maxLoan=r.maxLoan||0;
@@ -2684,7 +2697,7 @@ function renderCosts(){
 
     ${!isNewL?`
     <tr><td colspan="5" style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:10px 11px 4px;background:var(--bg4)">AGENT FEES</td></tr>
-    <tr><td>Agent Commission (Buyer's agent)</td>
+    <tr><td>Agent Commission</td>
         <td><input class="editable-input" type="number" id="c-agent" value="${defaults.agent}" oninput="updateCostTotal()"></td>
         <td>Completion</td><td><span class="tag tag-var">Negotiable</span></td><td>Typically 1% of price. New launch: developer pays.</td></tr>
     <tr><td>GST on agent commission (9%)</td>
@@ -2692,7 +2705,13 @@ function renderCosts(){
         <td>Completion</td><td><span class="tag tag-var">Negotiable</span></td><td>GST payable on top of commission</td></tr>
     `:''}
 
-    <tr><td colspan="5" style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:10px 11px 4px;background:var(--bg4)">MISCELLANEOUS / UPFRONT COSTS</td></tr>
+    <tr id="misc-toggle-row" onclick="toggleMiscSection()" style="cursor:pointer">
+      <td colspan="5" style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:10px 11px 4px;background:var(--bg4);user-select:none">
+        <span>MISCELLANEOUS / UPFRONT COSTS</span>
+        <span id="misc-toggle-icon" style="float:right;font-size:13px;color:var(--blue2)">▼ hide</span>
+      </td>
+    </tr>
+    <tbody id="misc-rows">
     ${isHDB?`<tr><td>HDB Resale Portal Admin Fee</td>
         <td><input class="editable-input" type="number" id="c-hdbadmin" value="160" oninput="updateCostTotal()"></td>
         <td>Upon submission</td><td><span class="tag tag-req">Required</span></td><td>$80 buyer + $80 seller (each party pays own)</td></tr>`:''}
@@ -2715,6 +2734,7 @@ function renderCosts(){
         <td><input class="editable-input" type="number" id="c-reno" value="${defaults.reno}" oninput="updateCostTotal()"></td>
         <td>Post-completion</td><td><span class="tag tag-opt">Optional</span></td><td>Highly variable. ${isHDB?'HDB reno permit required.':isLanded?'A&A requires URA/BCA approval.':'MCST reno approval required.'}</td></tr>
 
+    </tbody>
     <tr style="background:rgba(200,169,110,0.05)">
       <td style="font-weight:600;color:var(--text);font-size:13.5px">TOTAL ONE-TIME COSTS (excl. reno)</td>
       <td id="cost-total" colspan="4" style="font-weight:600;font-family:'DM Mono',monospace;color:var(--gold);font-size:15px">Calculating...</td>
@@ -3198,7 +3218,16 @@ function renderNewLaunchFlow(){
     <div class="stat-tile"><div class="stat-label">Max Loan</div><div class="stat-value" style="color:var(--blue2)">$${fmt(maxLoan)}</div><div class="stat-sub">${((r.ltvPct||.75)*100).toFixed(0)}% LTV</div></div>
     <div class="stat-tile"><div class="stat-label">Monthly Instalment</div><div class="stat-value" style="color:var(--green)">$${fmt(monthly)}</div><div class="stat-sub">from first drawdown</div></div>
   </div>`;
-  let h=buildFlowSVG(stages)+summaryHtml+`<div style="display:flex;flex-direction:column;gap:10px">`;
+  const priceBanner = `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(200,169,110,0.08);border:1px solid rgba(200,169,110,0.2);border-radius:8px;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Purchase Price</div>
+    <div style="font-size:22px;font-weight:600;font-family:'DM Mono',monospace;color:var(--gold)">$${fmt(price)}</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div style="font-size:11px;color:var(--text3)">Loan: <span style="color:var(--blue2);font-weight:600">$${fmt(maxLoan)}</span></div>
+      <div style="font-size:11px;color:var(--text3)">Stamp Duty: <span style="color:var(--amber);font-weight:600">$${fmt(bsd+absd)}</span></div>
+      <div style="font-size:11px;color:var(--text3)">Monthly: <span style="color:var(--green);font-weight:600">$${fmt(monthly)}/mo</span></div>
+    </div>
+  </div>`;
+  let h=priceBanner+buildFlowSVG(stages)+summaryHtml+`<div style="display:flex;flex-direction:column;gap:10px">`;
   h+=divider(c1,'Step 1 — Preparation');
   h+=stageCard(1,c1,'Secure IPA from Bank & Engage Agent','1–2 weeks',[{label:'IPA Cost',val:'$0',sub:'Free — apply before viewing',cls:'blue'}],'Get In-Principle Approval from your bank before committing to any unit. Without an IPA, you risk booking a unit and being unable to secure financing. Engage a CEA-registered agent — for new launches, developer pays the agent commission, so buyer representation is free.','Do not attend showflats and book a unit in the same day without an IPA. The 5% booking fee is non-refundable if you back out.','Check the developer\'s track record and estimated TOP date. Ask for ABSD remission eligibility for your specific situation.');
   h+=divider(c2,'Step 2 — Book Unit');
@@ -3240,7 +3269,16 @@ function renderResaleCondoFlow(){
     <div class="stat-tile"><div class="stat-label">Max Loan</div><div class="stat-value" style="color:var(--blue2)">$${fmt(maxLoan)}</div><div class="stat-sub">${((r.ltvPct||.75)*100).toFixed(0)}% LTV</div></div>
     <div class="stat-tile"><div class="stat-label">Monthly Instalment</div><div class="stat-value" style="color:var(--green)">$${fmt(monthly)}</div><div class="stat-sub">from completion</div></div>
   </div>`;
-  let h=buildFlowSVG(stages)+summaryHtml+`<div style="display:flex;flex-direction:column;gap:10px">`;
+  const priceBanner = `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(200,169,110,0.08);border:1px solid rgba(200,169,110,0.2);border-radius:8px;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Purchase Price</div>
+    <div style="font-size:22px;font-weight:600;font-family:'DM Mono',monospace;color:var(--gold)">$${fmt(price)}</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div style="font-size:11px;color:var(--text3)">Loan: <span style="color:var(--blue2);font-weight:600">$${fmt(maxLoan)}</span></div>
+      <div style="font-size:11px;color:var(--text3)">Stamp Duty: <span style="color:var(--amber);font-weight:600">$${fmt(bsd+absd)}</span></div>
+      <div style="font-size:11px;color:var(--text3)">Monthly: <span style="color:var(--green);font-weight:600">$${fmt(monthly)}/mo</span></div>
+    </div>
+  </div>`;
+  let h=priceBanner+buildFlowSVG(stages)+summaryHtml+`<div style="display:flex;flex-direction:column;gap:10px">`;
   h+=divider(c1,'Step 1 — Preparation');
   h+=stageCard(1,c1,'Secure AIP & Search for Unit','1–2 weeks',[{label:'AIP Cost',val:'$0',sub:'Free from bank',cls:'blue'}],'Obtain an Approval In-Principle (AIP) letter from your bank before making any offer. Search listings on PropertyGuru, 99.co, or EdgeProp. Cross-reference asking prices against recent transactions on SRX or URA REALIS.','Without an AIP, you may exercise an OTP only to find you cannot secure the required loan amount. You will lose the 1% option fee.','Engage a CEA-registered buyer\'s agent early. For resale condo, buyer\'s commission is negotiable (typically 1% + GST) — clarify before viewing.');
   h+=divider(c2,'Step 2 — Option to Purchase');
@@ -3283,7 +3321,16 @@ function renderLandedFlow(){
     <div class="stat-tile"><div class="stat-label">Max Loan</div><div class="stat-value" style="color:var(--blue2)">$${fmt(maxLoan)}</div><div class="stat-sub">${((r.ltvPct||.75)*100).toFixed(0)}% LTV</div></div>
     <div class="stat-tile"><div class="stat-label">Monthly Instalment</div><div class="stat-value" style="color:var(--green)">$${fmt(monthly)}</div><div class="stat-sub">from completion</div></div>
   </div>`;
-  let h=buildFlowSVG(stages)+summaryHtml+`<div style="display:flex;flex-direction:column;gap:10px">`;
+  const priceBannerL = `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(200,169,110,0.08);border:1px solid rgba(200,169,110,0.2);border-radius:8px;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Purchase Price</div>
+    <div style="font-size:22px;font-weight:600;font-family:'DM Mono',monospace;color:var(--gold)">$${fmt(price)}</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div style="font-size:11px;color:var(--text3)">Loan: <span style="color:var(--blue2);font-weight:600">$${fmt(maxLoan)}</span></div>
+      <div style="font-size:11px;color:var(--text3)">Stamp Duty: <span style="color:var(--amber);font-weight:600">$${fmt(bsd+absd)}</span></div>
+      <div style="font-size:11px;color:var(--text3)">Monthly: <span style="color:var(--green);font-weight:600">$${fmt(monthly)}/mo</span></div>
+    </div>
+  </div>`;
+  let h=priceBannerL+buildFlowSVG(stages)+summaryHtml+`<div style="display:flex;flex-direction:column;gap:10px">`;
   h+=divider(c1,'Step 1 — Confirm Eligibility');
   h+=stageCard(1,c1,'Confirm Eligibility to Purchase Landed Property','Before any commitment',[{label:'Eligibility',val:'SC: Free',sub:'PR/Foreigner: LDAU approval required',cls:'blue'}],'Only Singapore Citizens can freely purchase landed residential property in Singapore (terrace, semi-detached, bungalow, good class bungalow). Permanent Residents and foreigners must obtain prior approval from the Land Dealings Approval Unit (LDAU) under the Singapore Land Authority — approvals are very rarely granted and only for exceptional circumstances. Sentosa Cove is an exception where foreigners may purchase approved properties with LDAU approval, but 60% ABSD applies.','PRs and foreigners who purchase landed property without LDAU approval commit an offence under the Residential Property Act. This is a criminal offence, not just a civil matter.','Even if you are a Singapore Citizen, check if there are any restrictions on the specific land parcel — some are gazetted for specific use or have road reserve issues. Engage a property lawyer before making any offer.');
   h+=divider(c2,'Step 2 — OTP & Immediate Due Diligence');
