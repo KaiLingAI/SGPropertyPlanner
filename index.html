@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- SG Property Planner v5.7 | 1774200669 -->
+<!-- SG Property Planner v6.9 | 1774205074 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -731,7 +731,7 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer;margin-top:
           </select>
         </div>
         <div class="field-group" style="margin-bottom:0">
-          <div class="field-label">Age <span id="age-tenure-hint" style="font-size:10px;color:var(--teal);font-weight:400">→ max <span id="age-max-tenure">30yr</span></span></div>
+          <div class="field-label">Age</div>
           <input type="number" id="b1-age" value="35" min="21" max="75" oninput="onAgeOrTenureChange('age')">
         </div>
         <div class="field-group" style="margin-bottom:0">
@@ -809,6 +809,14 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer;margin-top:
         <span style="color:var(--text3)">Combined income: <strong style="color:var(--text)" id="combined-income">—</strong></span>
         <span id="income-note" style="color:var(--text3)">Buyer 1 only</span>
         <span style="color:var(--text3)">TDSR limit: <strong style="color:var(--text)" id="tdsr-income-limit">—</strong>/mo</span>
+      </div>
+
+      <!-- HDB Lease Age Calculator — shown only for HDB tab -->
+      <div id="hdb-lease-calc" style="display:none;margin-top:12px;background:rgba(46,196,169,0.05);border:1px solid rgba(46,196,169,0.25);border-radius:8px;padding:12px 14px">
+        <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🏠 HDB Lease Age Guide — 95-Year Rule</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.6">Based on your age, here is the <strong style="color:var(--text)">oldest HDB flat</strong> you can buy to qualify for <strong style="color:var(--teal)">full CPF usage and full HDB loan (75% LTV)</strong>. Rule: youngest buyer's age + remaining lease must ≥ 95 years.</div>
+        <div id="hdb-lease-result" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"></div>
+        <div id="hdb-lease-prorated" style="font-size:11px;color:var(--amber);padding:7px 10px;background:rgba(229,162,40,0.07);border-radius:5px;border-left:2px solid var(--amber);line-height:1.6;display:none"></div>
       </div>
 
     </div>
@@ -944,7 +952,7 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer;margin-top:
         </div>
         <div class="field-group">
           <div class="field-label" style="display:flex;align-items:center;justify-content:space-between">
-            <span>Loan Tenure (years) <span id="tenure-cap-note" style="color:var(--amber);font-size:10px"></span></span>
+            <span>Loan Tenure (years) <span id="tenure-cap-note" style="color:var(--amber);font-size:10px"></span></span><span id="age-tenure-hint" style="font-size:10px;color:var(--teal);font-weight:400;margin-left:6px">→ rec. max: <span id="age-max-tenure">30yr</span></span>
             <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10.5px;color:var(--text3);font-weight:400">
               <input type="checkbox" id="toggle-age75" onchange="onAgeOrTenureChange()" style="width:auto;min-height:0;padding:0;accent-color:var(--amber)">
               <span style="color:var(--amber)">Extend to age 75</span>
@@ -1229,7 +1237,7 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer;margin-top:
 <div class="panel" id="panel-timeline">
   <div class="section-header">
     <div class="section-title" id="tl-title">Transaction Timeline</div>
-    <div class="section-desc">Click each step to expand details and pitfall warnings.</div>
+    <div class="section-desc">Set a start date to see exact calendar dates and amounts at each step. Tap any step to expand details and tips.</div>
   </div>
 
   <!-- DATE INPUT CARD -->
@@ -1240,7 +1248,7 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer;margin-top:
         <div class="field-group" style="margin-bottom:0">
           <div class="field-label">Transaction Start Date</div>
           <input type="date" id="tl-start-date" style="width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none"
-            onchange="syncTimelineToCalc(this.value)" />
+            oninput="syncTimelineToCalc(this.value)" onchange="syncTimelineToCalc(this.value)" />
         </div>
         <div style="font-size:12px;color:var(--text2);line-height:1.6;padding-bottom:4px">
           Set a date and each step will show its <strong style="color:var(--gold)">estimated calendar date</strong> and <strong style="color:var(--teal)">exact amount due</strong> — so you know what to prepare and when.
@@ -1250,25 +1258,9 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer;margin-top:
     </div>
   </div>
 
-  <!-- KEY MILESTONE DATES — Resale Condo & HDB only, shown inline in Timeline tab -->
-  <div class="card" id="milestone-dates-card" style="border-color:rgba(74,159,212,0.25);display:none">
-    <div class="card-header" style="background:rgba(74,159,212,0.04)">
-      <span>📆</span>
-      <span class="card-title" style="color:var(--blue2)">Key Milestone Dates</span>
-      <span style="margin-left:auto;font-size:10.5px;color:var(--text3)">Dates update from Start Date above — adjustable estimates shown with ±</span>
-    </div>
-    <div class="card-body">
-      <div id="date-plan-results" style="display:none">
-        <div id="date-plan-table"></div>
-        <div style="margin-top:12px;font-size:11px;color:var(--text3);line-height:1.6;padding:10px;background:var(--bg4);border-radius:6px">
-          ⓘ Dates are indicative based on your start date. Legal deadlines (BSD, ABSD) are strictly enforced — late payment incurs penalty + interest up to 4×. Always confirm with your conveyancing lawyer.
-        </div>
-      </div>
-      <div id="date-plan-empty" style="font-size:12.5px;color:var(--text3);text-align:center;padding:14px 0">
-        Set a Start Date above to see your key milestone dates.
-      </div>
-    </div>
-  </div>
+  <!-- date-plan-results and table kept for renderDatePlan() but rendered hidden -->
+  <div id="date-plan-results" style="display:none"><div id="date-plan-table"></div></div>
+  <div id="date-plan-empty" style="display:none"></div>
 
   <div id="timeline-container"></div>
 </div>
@@ -1757,7 +1749,7 @@ function showPanel(id){
   }
   // Panel-specific render triggers
   if(id==='costs')      renderCosts();
-  if(id==='timeline')   { renderTimeline(); if(propType==='resalecondo'||propType==='hdb') renderDatePlan(); }
+  if(id==='timeline')   { if(propType==='resalecondo'||propType==='hdb') renderDatePlan(); renderTimeline(); }
   if(id==='guide')      renderPitfalls();
   if(id==='flow')       renderFlowTimeline();
   if(id==='news')       fetchPolicyNews();
@@ -1804,11 +1796,30 @@ function setPropType(type,el){
   } else {
     Array.from(lsEl.options).forEach(o=>o.disabled=false);
   }
+
+  // ── HDB-specific defaults ──
+  const ppEl   = document.getElementById('purchasePrice');
+  const valEl  = document.getElementById('valuation');
+  const cashEl2= document.getElementById('cash-onhand');
+  if(type==='hdb'){
+    // Set HDB-appropriate default values only if still at the old default
+    if(ppEl  && (numVal('purchasePrice')===1200000||!numVal('purchasePrice'))) { ppEl.value='500,000'; ppEl.type='text'; ppEl.inputMode='numeric'; }
+    if(valEl && (numVal('valuation')===1200000||!numVal('valuation')))         { valEl.value='500,000'; valEl.type='text'; valEl.inputMode='numeric'; }
+    if(cashEl2 && !numVal('cash-onhand'))                                       { cashEl2.value='5,000'; cashEl2.type='text'; cashEl2.inputMode='numeric'; }
+    // Default to HDB loan
+    if(lsEl && lsEl.value==='bank') lsEl.value='hdb';
+  } else if(type!=='hdb'){
+    // Restore default private property price if still at HDB default
+    if(ppEl  && numVal('purchasePrice')===500000) { ppEl.value='1,200,000'; ppEl.type='text'; ppEl.inputMode='numeric'; }
+    if(valEl && numVal('valuation')===500000)      { valEl.value='1,200,000'; valEl.type='text'; valEl.inputMode='numeric'; }
+  }
+
   onAgeOrTenureChange(); // recalculate with correct tenure limits for property type
   // show/hide HDB grant section based on property type
   const grantSec = document.getElementById('hdb-grant-section');
   if(grantSec) grantSec.style.display = type==='hdb' ? 'block' : 'none';
-  if(type==='hdb') calcGrants();
+  if(type==='hdb'){ calcGrants(); updateHDBLeaseCalc(); }
+  else { const lc=document.getElementById('hdb-lease-calc'); if(lc) lc.style.display='none'; }
   // refresh active panel sub-content
   const ap=document.querySelector('.panel.active');
   // update Date Planner badge and recalc if date set
@@ -1820,24 +1831,80 @@ function setPropType(type,el){
   updateFlowDockLabel();
 }
 
+function updateHDBLeaseCalc(){
+  const lc = document.getElementById('hdb-lease-calc');
+  if(!lc) return;
+  if(propType !== 'hdb'){ lc.style.display='none'; return; }
+  lc.style.display = 'block';
+
+  const thisYear   = new Date().getFullYear(); // 2026
+  const b1age      = parseInt(document.getElementById('b1-age')?.value)||35;
+  const b2visible  = document.getElementById('buyer2-card')?.style.display !== 'none';
+  const b2age      = b2visible ? (parseInt(document.getElementById('b2-age')?.value)||35) : b1age;
+  const youngestAge= Math.min(b1age, b2age);
+  const oldestAge  = Math.max(b1age, b2age);
+
+  // Min remaining lease for FULL CPF + full HDB loan (LTV 75%)
+  const minLeaseFull = Math.max(0, 95 - youngestAge);  // e.g. age 35 → need 60 yr lease
+  // Oldest built year where flat STILL has minLeaseFull years left:
+  // Flat built in year X, lease = 99 yrs, expires year X+99
+  // Remaining lease at purchase = X + 99 - thisYear ≥ minLeaseFull
+  // → X ≥ thisYear - 99 + minLeaseFull
+  const oldestBuiltFull   = thisYear - 99 + minLeaseFull;  // oldest built year for full CPF
+  const oldestBuiltProRate = thisYear - 79;  // 20yr minimum remaining lease (no CPF if older)
+  const remainingIfBought  = 99 - (thisYear - oldestBuiltFull); // should = minLeaseFull
+
+  // Pro-rated CPF: if lease can't reach 95, CPF is pro-rated
+  // For any flat with remaining lease between 20 and minLeaseFull: pro-rated
+  const prorateBuiltOldest = oldestBuiltProRate; // anything built after thisYear-79 has ≥20yr
+  const coveredAge = youngestAge + minLeaseFull;
+
+  const resEl   = document.getElementById('hdb-lease-result');
+  const proEl   = document.getElementById('hdb-lease-prorated');
+  if(!resEl) return;
+
+  const tile = (label, value, sub, color) =>
+    `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:10px 12px">
+      <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px">${label}</div>
+      <div style="font-size:16px;font-weight:700;font-family:'Atkinson Hyperlegible','DM Mono',monospace;color:${color}">${value}</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:2px;line-height:1.4">${sub}</div>
+    </div>`;
+
+  resEl.innerHTML =
+    tile('Min Lease for Full CPF', minLeaseFull + ' yrs', 'Youngest buyer age ' + youngestAge + ' + ' + minLeaseFull + ' = 95', 'var(--teal)') +
+    tile('Oldest Flat Built Year', oldestBuiltFull >= 1960 ? oldestBuiltFull : 'N/A', 'Still has ' + minLeaseFull + 'yr lease in ' + thisYear, 'var(--green)') +
+    tile('Age Covered Till', coveredAge + (coveredAge>=95?' ✓':' ⚠'), youngestAge + 'yr + ' + minLeaseFull + 'yr lease', coveredAge>=95?'var(--green)':'var(--red)') +
+    tile('Flat Usable Until', (oldestBuiltFull + 99) + ' (est.)', '99-year lease from ' + oldestBuiltFull, 'var(--text2)');
+
+  // Pro-rated warning
+  if(proEl){
+    if(b2visible && youngestAge !== oldestAge){
+      proEl.style.display = 'block';
+      proEl.innerHTML = `With 2 buyers (ages ${b1age} & ${b2age}): youngest is <strong>${youngestAge}</strong> — <strong>always use youngest age</strong> for the 95-year check, regardless of who holds more CPF.<br>Flat built before <strong>${oldestBuiltFull}</strong> → CPF pro-rated (partial use). Flat built before <strong>${oldestBuiltProRate}</strong> → no CPF or HDB loan allowed.`;
+    } else {
+      proEl.style.display = 'block';
+      proEl.innerHTML = `Flat built between <strong>${oldestBuiltProRate}</strong>–<strong>${oldestBuiltFull}</strong>: CPF usage is <strong style="color:var(--amber)">pro-rated</strong> — you can still buy but get less CPF and a lower LTV.<br>Flat built before <strong>${oldestBuiltProRate}</strong> (< 20yr lease): <strong style="color:var(--red)">no CPF or HDB loan allowed</strong>.`;
+    }
+  }
+}
+
 function syncOTPDate(val){
   // Sync calc OTP date → timeline start date AND date planner
   const tlDate = document.getElementById('tl-start-date');
-  if(tlDate) tlDate.value = val;
+  if(tlDate){ tlDate.value = val; }
   const dpDate = document.getElementById('startDate');
   if(dpDate) dpDate.value = val;
+  if(propType==='resalecondo'||propType==='hdb') renderDatePlan();
   renderTimeline();
-  renderDatePlan();
 }
 
 function syncTimelineToCalc(val){
-  // Sync timeline date → calc OTP date AND date planner
+  if(!val) return;
   const calcDate = document.getElementById('calc-otp-date');
   if(calcDate) calcDate.value = val;
   const dpDate = document.getElementById('startDate');
   if(dpDate) dpDate.value = val;
   renderTimeline();
-  renderDatePlan();
 }
 
 function clearAll(){
@@ -1897,6 +1964,7 @@ function toggleProfileCard(){
 function setBuyerCount(n){
   buyerCount=n;
   document.getElementById('buyer2-card').style.display = n===2?'block':'none';
+  if(propType==='hdb') updateHDBLeaseCalc();
   document.getElementById('btn-1buyer').className = n===1?'btn btn-primary':'btn btn-outline';
   document.getElementById('btn-2buyer').className = n===2?'btn btn-primary':'btn btn-outline';
   document.getElementById('absd-joint-note').style.display = n===2?'block':'none';
@@ -2122,6 +2190,7 @@ function onAgeOrTenureChange(changedField){
   }
 
   calculate();
+  if(propType==='hdb') updateHDBLeaseCalc();
 }
 
 function calculate(){
@@ -2321,6 +2390,7 @@ function calculate(){
   // DP schedule
   renderDPSchedule();
   recalcFunds(); // keep Cash & CPF planner in sync
+  updateHDBLeaseCalc(); // update HDB lease age guide
   // refresh grant calculator if HDB tab
   if(propType==='hdb') calcGrants();
 }
@@ -2328,6 +2398,8 @@ function calculate(){
 // ═══════════════════════════════════════
 // TRANSACTION DATE PLANNER
 // ═══════════════════════════════════════
+let _lastMilestones = []; // shared with renderTimeline for unified display
+
 function renderDatePlan(){
   const badge = document.getElementById('date-proptype-badge');
   const propLabels = {newlaunch:'New Launch Condo',resalecondo:'Resale Condo',hdb:'Resale HDB',landed:'Landed Property'};
@@ -2341,7 +2413,7 @@ function renderDatePlan(){
   const startStr = document.getElementById('startDate')?.value;
   const resEl = document.getElementById('date-plan-results');
   const emptyEl = document.getElementById('date-plan-empty');
-  if(!startStr){ if(resEl) resEl.style.display='none'; if(emptyEl) emptyEl.style.display='block'; return; }
+  if(!startStr){ if(resEl) resEl.style.display='none'; if(emptyEl) emptyEl.style.display='none'; return; }
 
   const start = new Date(startStr);
   const addDays = (d,n)=>{ const r=new Date(d); r.setDate(r.getDate()+n); return r; };
@@ -2416,10 +2488,7 @@ function renderDatePlan(){
         amount:fmtMoney(optFee),
         note:'Cash only · non-refundable · Seller cannot grant OTP to another buyer during option period · Engage lawyer now',
         warn:false,color:'var(--gold)',fixed:true},
-      {label:'📋 Caveat lodged by buyer\'s lawyer',date:caveats,
-        amount:'~$300–500',
-        note:'Buyer\'s solicitor lodges caveat with SLA within days of OTP to protect buyer\'s interest',
-        warn:false,color:'var(--teal)',fixed:true},
+      // caveat handled by lawyer
       {label:'✍ Exercise OTP — Balance deposit paid',date:exercise,
         amount:fmtMoney(exFee+balDeposit),
         note:'Option period: typically 14 days for private property (negotiable — use ± below to adjust) · Cash or CPF · Must have AIP/IPA from bank before exercising',
@@ -2457,6 +2526,38 @@ function renderDatePlan(){
       {label:'Completion (est.)',date:completion,amount:fmtMoney(r.maxLoan),note:'8–12 weeks — full loan drawdown',warn:false,color:'var(--green)'},
     ];
   }
+
+  // Store milestones for renderTimeline unified display
+  const today2 = new Date(); today2.setHours(0,0,0,0);
+  _lastMilestones = milestones.map((m, i)=>{
+    const offset2 = (m.fixed) ? 0 : (_dateOffsets[i] || 0);
+    const adjDate2 = addDays(m.date, offset2);
+    const dl2      = Math.round((adjDate2 - today2)/(1000*60*60*24));
+    const urgent2  = m.warn && dl2 >= 0 && dl2 <= 14;
+    const showEdit2= !m.fixed && (propType==='resalecondo' || propType==='hdb');
+    const editHtml2= showEdit2 ? `<div style="display:flex;align-items:center;gap:4px;margin-top:6px">
+      <span style="font-size:10.5px;color:var(--text3)">${m.optionPeriod?'Option period:':'Adjust date by'}</span>
+      <button onclick="event.stopPropagation();adjustDateOffset(${i},-1)" style="width:20px;height:20px;border-radius:4px;border:1px solid var(--border2);background:var(--bg4);color:var(--text2);font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-weight:600">−</button>
+      <input type="number" value="${offset2}" style="width:42px;text-align:center;padding:2px 4px;background:var(--bg3);border:1px solid var(--blue2);border-radius:4px;color:var(--text);font-size:11px;font-family:'Atkinson Hyperlegible','DM Mono',monospace;outline:none"
+        onblur="setDateOffset(${i},parseInt(this.value)||0)"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();setDateOffset(${i},parseInt(this.value)||0);this.blur();}">
+      <span style="font-size:10.5px;color:var(--text3)">days</span>
+      <button onclick="event.stopPropagation();adjustDateOffset(${i},1)" style="width:20px;height:20px;border-radius:4px;border:1px solid var(--border2);background:var(--bg4);color:var(--text2);font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-weight:600">+</button>
+    </div>` : '';
+    return {
+      label:    m.label,
+      dateStr:  fmtDate(adjDate2),
+      amount:   m.amount,
+      note:     m.note,
+      daysLeft: dl2,
+      isPast:   dl2 < 0,
+      isUrgent: urgent2,
+      showEdit: showEdit2,
+      editHtml: editHtml2,
+    };
+  });
+
+  // _lastMilestones stored above — renderTimeline reads stepDates directly, not these
 
   // For resale condo: all dates editable
   // For HDB: only estimated dates editable (fixed:false), fixed legal deadlines are read-only
@@ -2560,8 +2661,7 @@ function renderDatePlan(){
   }
 
   if(tableEl) tableEl.innerHTML = html;
-  if(resEl) resEl.style.display = 'block';
-  if(emptyEl) emptyEl.style.display = 'none';
+  // date-plan-results stays hidden — UI is rendered by renderTimeline()
   // Restore scroll position after re-render
   requestAnimationFrame(()=>{
     if(sa) sa.scrollTop = scrollBefore;
@@ -2571,15 +2671,15 @@ function renderDatePlan(){
 
 function adjustDateOffset(idx, delta){
   _dateOffsets[idx] = (_dateOffsets[idx] || 0) + delta;
-  renderDatePlan();
+  renderTimeline(idx); // pass idx to re-open the same row
 }
 function setDateOffset(idx, val){
   _dateOffsets[idx] = val || 0;
-  renderDatePlan();
+  renderTimeline(idx); // pass idx to re-open the same row
 }
 function resetDateOffsets(){
   _dateOffsets = {};
-  renderDatePlan();
+  renderTimeline();
 }
 
 function toggleInterest(){
@@ -3291,25 +3391,52 @@ const TIMELINES={
     {step:'Post-Purchase',title:'Ongoing Obligations',days:'Ongoing',color:'gold',body:'SSD applicable for first 4 years (properties bought from 4 Jul 2025): 16%/12%/8%/4%. Annual property tax. Monthly MCST fees. Fire insurance mandatory. Mortgage review at end of lock-in period (typically 2–3 years).',pitfall:'Short-term rentals (<3 months) are illegal for private residential. Long-term rentals require MCST approval check.'}
   ],
   resalecondo:[
-    {step:'Step 1',title:'AIP & Property Search',days:'1–2 weeks',color:'blue',body:'Obtain AIP from bank. Engage agent. Shortlist and view units. Cross-reference asking price with SRX transacted data and REALIS.',tip:'Commission a caveat search on the property before making any commitment.'},
-    {step:'Step 2',title:'Negotiate & Grant OTP',days:'Day 1',color:'blue',body:'Agree on price. Seller grants OTP. Buyer pays 1% option fee (cash). OTP period: typically 14 days (extendable to 21 by agreement). Seller is bound during OTP.',pitfall:'Verbal price agreements are not binding. Only a signed OTP provides legal protection.'},
-    {step:'Step 3',title:'Due Diligence during OTP',days:'14 days',color:'gold',body:'Commission bank valuation ($350–$700). Engage lawyer for title searches, encumbrance checks, MCST outstanding fees. Confirm CPF usage with CPF Board portal.',pitfall:'Valuation shortfall is very common in active markets. If bank values below agreed price, the gap must be covered in cash.',tip:'Check if there are any pending lawsuits, caveats, or mortgages on the property via SLA.'},
-    {step:'Step 4',title:'Exercise OTP',days:'Day 14',color:'gold',body:'Pay exercise fee (typically 4%, bringing total to 5%). Lawyer forwards exercised OTP to seller\'s lawyer. Completion date set: typically 8–12 weeks.',pitfall:'Missing OTP expiry (by even 1 minute at 4pm) forfeits your 1% option fee.'},
-    {step:'Step 5',title:'Pay Stamp Duties',days:'Within 14 days of exercise',color:'red',body:'BSD + ABSD due within 14 days of exercise date. Payable via IRAS portal — lawyers typically manage. Can use CPF OA or cash.',pitfall:'ABSD must be paid even before keys are handed over. For large sums, ensure cash is ready.'},
-    {step:'Step 6',title:'Completion',days:'8–12 weeks',color:'teal',body:'Both lawyers confirm completion. Bank disburses loan. Balance purchase price transferred to seller. CPF Board releases funds. Keys exchanged. Caveat lodged. Title transferred.',tip:'Do a final inspection the day before completion — ensure all agreed fixtures remain and no damage occurred.'},
-    {step:'Post-Purchase',title:'After Completion',days:'Ongoing',color:'green',body:'SSD if sold within 4 years (from 4 Jul 2025): 16%/12%/8%/4%. Property tax commences. MCST fees and fire insurance mandatory. Review refinancing after lock-in period.',pitfall:'AV (Annual Value) for property tax is assessed by IRAS and may differ from expected. Budget for it in year one.'}
+    {step:'Step 1',title:'Receive OTP — Pay Option Fee (1%)',days:'Day 1',color:'gold',msKey:'otp',
+     body:'Agree on price with seller. Seller signs and hands you the Option to Purchase (OTP). Pay 1% option fee in cash — non-refundable. Seller cannot accept other buyers during the option period (typically 14 days, negotiable up to 21 days). Appoint your conveyancing lawyer immediately — they lodge a caveat and run due diligence.',
+     pitfall:'Verbal price agreements have zero legal standing. Only a signed OTP protects you.',
+     tip:'Send the OTP to your bank immediately — they need it to arrange the valuation and formal Letter of Offer.'},
+    {step:'Step 2',title:'Option Period — Due Diligence & Valuation',days:'14 days (adjustable)',color:'blue',msKey:'diligence',offsetIdx:2,
+     body:'During the option period, your lawyer runs title searches, checks for undischarged mortgages, MCST fees, and encumbrances. The bank arranges a property valuation ($350–$700). If bank valuation < agreed price, the gap (COV) must be paid 100% in cash. Confirm CPF usage eligibility. Get your Letter of Offer from the bank before exercising.',
+     pitfall:'COV is common in hot markets — if the bank values $50K below agreed price, you need $50K extra cash at completion. Find out during this period, not after.',
+     tip:'Also check MCST financials for any pending special levies — these become your liability after completion.'},
+    {step:'Step 3',title:'Exercise OTP — Pay Balance Deposit (4%)',days:'By end of option period — 4pm deadline',color:'amber',msKey:'exercise',
+     body:'Pay exercise fee (typically 4%, bringing total deposit to 5%). Sign the OTP acceptance and return to seller\'s lawyer. Completion date agreed: typically 10–12 weeks from today. Must have Letter of Offer from bank before this step.',
+     pitfall:'The 4pm deadline on the last day is ABSOLUTE — missing it by even 1 minute forfeits your 1% option fee. Do not leave exercising to the last day.',
+     tip:'Confirm with your lawyer 2 days before the deadline that everything is in order. Set a reminder alarm.'},
+    {step:'Step 4',title:'Pay Stamp Duty (BSD + ABSD)',days:'Within 14 days of exercise — fixed by law',color:'red',msKey:'bsd',fixed:true,
+     body:'Buyer Stamp Duty (BSD) and any Additional Buyer Stamp Duty (ABSD) must be paid to IRAS within 14 days of exercising the OTP. Your lawyer handles submission. Can use CPF OA or cash. ABSD applies for 2nd+ property or foreigners/PRs.',
+     pitfall:'Late payment incurs IRAS penalties up to 4× the duty amount. For 2nd-property buyers, ABSD (20% SC) must be ready before exercising the OTP.',
+     tip:'Your lawyer auto-submits stamp duties. Confirm within 2 days of exercise that submission has been made.'},
+    {step:'Step 5',title:'Completion — Collect Your Keys',days:'10–12 weeks after exercise (adjustable)',color:'teal',msKey:'completion',offsetIdx:5,
+     body:'Both lawyers coordinate simultaneous transfer of title, funds, and keys. Bank disburses loan to seller. CPF OA releases funds. Seller\'s mortgage discharged. You receive the keys and Certificate of Title. Do a final inspection the day before to verify all agreed fixtures are present and no damage.',
+     pitfall:'If there is COV, have the full cash amount in your bank account 3 working days before completion — no last-minute arrangements possible.',
+     tip:'Set up SP Group utilities transfer before completion date. Arrange fire/content insurance to start from completion day.'}
   ],
   hdb:[
-    {step:'Step 1',title:'Apply for HFE Letter',days:'Up to 30 working days',color:'blue',body:'Apply for HDB Flat Eligibility (HFE) Letter on My Flat Eligibility portal. Confirms: eligibility, CPF Housing Grant amounts, HDB Loan Eligibility. Valid 6 months.',pitfall:'Without HFE, neither OTP submission nor HDB application can proceed. Apply early.',tip:'Maximise grants: Enhanced CPF Housing Grant ($120K), Proximity Grant ($30K), Family Grant ($80K).'},
-    {step:'Step 2',title:'Register Intent to Buy & Find Flat',days:'After HFE',color:'blue',body:'Buyer registers Intent to Buy (ITB) on HDB portal. Seller registers Intent to Sell (ITS). Both must be active before OTP is issued. Search listings on HDB Flat Portal, PropertyGuru, or 99.co.',tip:'Use HDB Map Services to check recent transacted prices within 200m of your shortlisted block.'},
-    {step:'Step 3',title:'Seller Issues OTP + Pay $1,000',days:'Upon agreement',color:'gold',body:'Seller issues HDB standard OTP (each OTP has unique serial). Buyer pays option fee: max $1,000 (3-room+), max $1 (2-room). OTP valid for 21 calendar days at 4pm.',pitfall:'Option fees above the HDB cap are an offence. DO NOT pay cash above the stipulated limit.',tip:'Use only the official HDB OTP form. Do not use any other format.'},
-    {step:'Step 4',title:'Buyer Applies for Valuation ($120)',days:'Within OTP period',color:'gold',body:'Buyer logs into HDB Flat Portal and applies for valuation report. Cost: $120. HDB appoints valuer — may visit property physically. Valuation report sent to buyer only.',pitfall:'If valuation < agreed price, the difference is COV (Cash Over Valuation) — must be paid in full cash. CPF cannot cover COV.',tip:'The valuation may take 3–7 working days. Apply immediately after receiving the OTP.'},
-    {step:'Step 5',title:'Exercise OTP — Pay Up To $4,000 Exercise Fee',days:'Within 21 days of OTP',color:'gold',body:'Total deposit to seller cannot exceed $5,000. If Option Fee was $1,000, Exercise Fee = up to $4,000. Pay in cash only — not CPF. Sign acceptance section (page 8 of OTP). For bank loan: must receive and accept Letter of Offer BEFORE exercising OTP. Total cash paid to seller: $5,000 max.',pitfall:'If exercise fee is not paid by 4pm on day 21, seller may forfeit your $1,000 option fee and void the sale. For bank loans, allow 5–10 working days to receive the LOO.',tip:'For bank loan, send the OTP and valuation report to the bank immediately after receiving them. Do not wait.'},
-    {step:'Step 6',title:'Pay BSD (Stamp Duty)',days:'Within 14 days of OTP exercise',color:'red',body:'BSD must be paid within 14 days of OTP exercise date. Can be paid via CPF OA or cash. IRAS Stamp Duty portal — lawyers or agents typically assist.',pitfall:'HDB buyers rarely owe ABSD on a first HDB purchase (SC: 0%). But SC buying HDB while owning another property attracts ABSD — plan for this.'},
-    {step:'Step 7',title:'Upload Resale Application to HDB Portal',days:'Within 7 days of each other (buyer & seller)',color:'teal',body:'Both buyer and seller log into HDB Resale Portal and upload their portions of the application within 7 days of each other. Admin fee: $80 per party ($160 total). HDB reviews and notifies acceptance (NOT approval yet).',pitfall:'If either party delays beyond 7 days of the other, the application is invalid and must restart.',tip:'Prepare all documents in advance: NRIC, CPF statement, income docs, HFE letter, bank LOO, exercised OTP.'},
-    {step:'Step 8',title:'Endorse Documents & HDB Approval',days:'2–4 weeks after submission',color:'teal',body:'HDB sends Notification of Acceptance. Both parties log in to endorse documents. HDB reviews full application and issues Approval Letter with Completion date.',tip:'Approval Letter includes the final completion appointment date and Town Council S&CC notification for seller.'},
-    {step:'Step 9',title:'Completion at HDB',days:'6–8 weeks after submission',color:'green',body:'Both buyer and seller (or their lawyers) attend HDB Hub for final appointment. Seller\'s CPF refunded (principal + accrued interest). Buyer\'s CPF grants disbursed. Loan drawdown. Cash proceeds cheque issued to seller. Keys handed over.',pitfall:'Seller must refund ALL CPF used + accrued interest at 2.5% p.a. For a flat held 20 years, this can be double the original CPF withdrawn.',tip:'Set up SP Group utilities transfer ~3 weeks before completion date via the SP Utilities app.'},
-    {step:'Post-Purchase',title:'MOP & Ongoing Obligations',days:'5-year MOP from completion',color:'gold',body:'5-year MOP: cannot sell, rent entire flat, or buy Singapore private property during MOP. Can rent individual bedrooms with HDB approval. Property tax at owner-occupier rates. Annual HDB Service and Conservancy Charges.',pitfall:'Buying private property in Singapore during MOP is a serious offence — HDB may compulsorily acquire the flat.'}
+    {step:'Step 1',title:'Grant OTP — Pay Option Fee (max $1,000)',days:'Day 1 — your transaction start',color:'gold',msKey:'otp',fixed:true,
+     body:'Seller issues the official HDB OTP form (unique serial number — do not accept any other format). You pay the Option Fee: max $1,000 for 3-room and larger (max $1 for 2-room), in cash only. The OTP is valid for 21 calendar days (including weekends and public holidays). On the same day or next working day, submit a Request for Value to HDB ($120) via My Flat Dashboard — this determines the flat\'s valuation for CPF usage and loan calculation. Valuation result typically available within 10 working days.',
+     pitfall:'Paying more than $1,000 option fee is an offence under HDB rules. If valuation comes in below agreed price, the difference (COV) must be paid 100% in cash — CPF and HDB loan cannot cover it.',
+     tip:'Apply for Request for Value immediately after receiving the OTP — valuation result must be available before you exercise.'},
+    {step:'Step 2',title:'Exercise OTP — Pay Exercise Fee (up to $4,000)',days:'Within 21 days of OTP — 4pm deadline',color:'amber',msKey:'exercise',fixed:true,
+     body:'Review the valuation result first. If taking a bank loan: must have signed the Letter of Offer before exercising. If taking HDB loan: HFE letter must still be valid. Pay the Exercise Fee in cash — total deposit (Option + Exercise) must not exceed $5,000. Sign page 8 of the OTP. Both buyer and seller must submit the resale application to HDB within 7 calendar days of each other.',
+     pitfall:'The 21-day deadline expires at 4pm — absolute. Missing it forfeits your option fee. For bank loans, banks need 5–10 working days to issue the Letter of Offer — apply immediately after receiving the OTP.',
+     tip:'Prepare all documents for HDB submission in advance: NRIC, CPF statement, HFE letter, bank Letter of Offer, exercised OTP. Submit your portion the same day you exercise.'},
+    {step:'Step 3',title:'Pay Buyer Stamp Duty (BSD)',days:'Within 14 days of exercise — fixed by law',color:'red',msKey:'bsd',fixed:true,
+     body:'BSD must be paid within 14 days of exercising the OTP. Can be paid using CPF OA or cash via IRAS. First-time SC buyers on their first property typically pay $0 ABSD. If you currently own another property, ABSD applies — check your situation before exercising the OTP.',
+     pitfall:'Late BSD payment incurs IRAS penalties up to 4× the stamp duty amount.',
+     tip:'Most HDB buyers pay BSD via CPF OA. Check your CPF OA balance before exercising the OTP.'},
+    {step:'Step 4',title:'Submit Resale Application — Both Parties',days:'Within 7 days of exercise',color:'teal',msKey:'submit',fixed:true,
+     body:'Both buyer and seller log into HDB Flat Portal (My Flat Dashboard) and submit their respective portions of the resale application within 7 calendar days of each other. Admin fee: $80 per party (3-room and above). HDB accepts the application within 28 working days (~6 weeks) and notifies both parties via SMS/email. This acceptance date starts the 8-week countdown to completion.',
+     pitfall:'If either party submits more than 7 days after the other, the application is void and must restart from scratch.',
+     tip:'Submit on the same day you exercise the OTP. Check HDB portal daily after submission.'},
+    {step:'Step 5',title:'Endorse Documents & HDB Approval',days:'~3 weeks after acceptance (adjustable)',color:'teal',msKey:'approval',offsetIdx:6,
+     body:'About 3 weeks after HDB accepts the application, both parties receive an SMS to log in to My Flat Dashboard to endorse the resale documents digitally. Pay any outstanding fees. After endorsement, HDB grants approval and issues the Completion Date. Flat may be inspected by HDB for structural issues and unauthorised renovations.',
+     pitfall:'If any unauthorised renovation is found (e.g. illegal hacking of walls), you must rectify before completion — this can delay the process.',
+     tip:'Check your My Flat Dashboard and email daily. Respond to any HDB requests within 5 working days to avoid delays.'},
+    {step:'Step 6',title:'Completion — Collect Your Keys',days:'~8 weeks after acceptance (adjustable)',color:'green',msKey:'completion',offsetIdx:7,
+     body:'At the HDB completion appointment (typically at HDB Hub), the bank or HDB disburses the loan. CPF housing grants are credited. You pay the balance of purchase price. Seller refunds all CPF used + accrued interest at 2.5% p.a. to their CPF account. Keys are handed over.',
+     pitfall:'Total timeline from OTP to completion is typically 14–20 weeks. Factor this into your housing plans — especially if you need to vacate a current property.',
+     tip:'Set up SP Group electricity and water transfer 2–3 weeks before completion via the SP Utilities app. Do a walk-through the day before completion.'}
   ],
   landed:[
     {step:'Step 1',title:'Confirm Eligibility to Purchase',days:'Before search',color:'blue',body:'Only SCs can freely own landed property in Singapore. PRs and foreigners need LDAU (SLA) approval — rarely granted. Sentosa Cove: foreigners may buy with LDAU approval.',pitfall:'PRs buying landed without LDAU approval commit an offence under the Residential Property Act.'},
@@ -3323,33 +3450,159 @@ const TIMELINES={
   ]
 };
 
-function renderTimeline(){
-  // Show Key Milestone Dates card only for resale condo and HDB
-  const milestoneCard = document.getElementById('milestone-dates-card');
-  if(milestoneCard){
-    const show = (propType==='resalecondo' || propType==='hdb');
-    milestoneCard.style.display = show ? 'block' : 'none';
-    if(show) renderDatePlan();
+function renderTimeline(reopenOffsetIdx){
+  if(!_calc || !_calc.price) return;
+
+  const r = _calc;
+  const price  = r.price||0, bsd = r.bsd||0, absd = r.absd||0, maxLoan = r.maxLoan||0;
+  const optFee = _deposit.optFee !== null ? _deposit.optFee : (propType==='hdb' ? Math.min(1000,Math.round(price*.01)) : Math.round(price*.01));
+  const exFee  = _deposit.exFee  !== null ? _deposit.exFee  : (propType==='hdb' ? Math.min(4000,5000-optFee) : Math.round(price*.04));
+  const fmt2   = n => '$'+Math.round(n||0).toLocaleString('en-SG');
+
+  const startStr = document.getElementById('tl-start-date')?.value || document.getElementById('startDate')?.value;
+  const hasDate  = !!startStr;
+  const start    = hasDate ? new Date(startStr) : null;
+
+  const addD = (d,n)=>{ const r=new Date(d); r.setDate(r.getDate()+n); return r; };
+  const addW = (d,n)=>addD(d,n*7);
+  const addM = (d,n)=>{ const r=new Date(d); r.setMonth(r.getMonth()+n); return r; };
+  const fmtD = d=>d.toLocaleDateString('en-SG',{day:'numeric',month:'short',year:'numeric'});
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  // ── Compute step dates directly ──
+  let stepDates = {}; // keyed by msKey
+  // ── Compute stepDates — official timelines per HDB.gov.sg & PropNex sources ──
+  if(start && propType==='resalecondo'){
+    // Official: OTP 14 days (negotiable), BSD 14 days after exercise, completion 10-12 weeks
+    const optPeriod  = 14 + (_dateOffsets[2]||0);       // option period: 14 days default, adjustable
+    const exercise   = addD(start, optPeriod);           // exercise = end of option period
+    const bsdDue     = addD(exercise, 14);               // FIXED by law: 14 days after exercise
+    const completion = addD(exercise, 70 + (_dateOffsets[5]||0)); // 10 weeks default, adjustable
+    stepDates = {
+      otp:        {date:start,             amount:fmt2(optFee),     note:'Cash only · non-refundable · appoint lawyer same day'},
+      diligence:  {date:addD(start,1),     amount:'~$350–700',      note:'Bank valuation + title searches during '+optPeriod+'-day option period · option period adjustable above'},
+      exercise:   {date:exercise,          amount:fmt2(exFee),      note:'4% deposit · 4pm deadline · must have bank Letter of Offer'},
+      bsd:        {date:bsdDue,            amount:fmt2(bsd+absd),   note:'Fixed by law: 14 days after exercise · CPF OA or cash'},
+      completion: {date:completion,        amount:fmt2(maxLoan),    note:'~10–12 weeks after exercise · loan drawdown · keys collected'},
+    };
+  } else if(start && propType==='hdb'){
+    // Official per HDB.gov.sg:
+    // OTP valid 21 days | BSD within 14 days of exercise
+    // Submit resale app within 7 days | HDB acceptance ~28 working days (~6 weeks)
+    // Endorse docs ~3 weeks after acceptance | Completion ~8 weeks from acceptance
+    const exercise    = addD(start, 21);                  // FIXED: 21 days by law
+    const bsdDue      = addD(exercise, 14);               // FIXED: 14 days after exercise
+    const hdbSubmit   = addD(exercise, 3);                // submit within 7 days — assume 3 days
+    const acceptance  = addD(hdbSubmit, 42);              // HDB acceptance ~28 working days (~6 weeks)
+    const endorse     = addD(acceptance, 21 + (_dateOffsets[6]||0)); // endorse ~3 weeks after acceptance
+    const completion  = addD(acceptance, 56 + (_dateOffsets[7]||0)); // completion ~8 weeks from acceptance
+    stepDates = {
+      otp:        {date:start,      amount:fmt2(optFee),      note:'Cash only · max $1,000 · submit Request for Value same day ($120)'},
+      exercise:   {date:exercise,   amount:fmt2(exFee),       note:'Cash only · total deposit max $5,000 · 4pm on day 21'},
+      bsd:        {date:bsdDue,     amount:fmt2(bsd),         note:'Fixed by law: 14 days after exercise · CPF OA or cash'},
+      submit:     {date:hdbSubmit,  amount:'$80 admin',       note:'Both parties submit within 7 days of each other · HDB accepts within ~28 working days'},
+      approval:   {date:endorse,    amount:'—',               note:'Endorse docs via My Flat Dashboard · pay fees · HDB grants approval'},
+      completion: {date:completion, amount:fmt2(maxLoan),     note:'~8 weeks from acceptance · loan drawdown · CPF grants credited · keys collected'},
+    };
   }
-  if(!_calc || !_calc.price) return; // guard: no data yet
-  const items=TIMELINES[propType]||[];
-  let h='<div class="timeline">';
-  items.forEach(item=>{
-    h+=`<div class="tl-item"><div class="tl-dot ${item.color}"></div>
-    <div class="tl-card" onclick="this.classList.toggle('expanded')">
-      <div class="tl-header">
-        <span class="tl-step">${item.step}</span>
-        <span class="tl-title">${item.title}</span>
-        <span class="tl-days">${item.days}</span>
+
+    // ── Helper to render date + countdown pill ──
+  const datePill = (d, fixed) => {
+    if(!d) return '';
+    const dl = Math.round((d-today)/86400000);
+    const past = dl<0, urgent = !fixed && dl>=0 && dl<=14;
+    const dateStr = fmtD(d);
+    let pill = '';
+    if(past)        pill = `<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:var(--bg4);color:var(--text3);border:1px solid var(--border)">✓ Done</span>`;
+    else if(urgent) pill = `<span style="font-size:10px;padding:2px 7px;border-radius:8px;background:rgba(229,92,92,0.15);color:var(--red);border:1px solid rgba(229,92,92,0.4);font-weight:700">🔴 ${dl}d from today</span>`;
+    else if(dl<=30) pill = `<span style="font-size:10px;padding:2px 7px;border-radius:8px;background:rgba(229,162,40,0.12);color:var(--amber);border:1px solid rgba(229,162,40,0.3);font-weight:600">${dl} days from today</span>`;
+    else            pill = `<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:rgba(74,159,212,0.1);color:var(--blue2);border:1px solid rgba(74,159,212,0.25)">${dl} days from today</span>`;
+    return `<span style="font-family:'Atkinson Hyperlegible','DM Mono',monospace;font-size:11.5px;font-weight:700;color:${past?'var(--text3)':'var(--text)'}">${dateStr}</span> ${pill}`;
+  };
+
+  const items = TIMELINES[propType] || [];
+  const container = document.getElementById('timeline-container');
+  if(!container) return;
+
+  let h = '';
+  if((propType==='resalecondo'||propType==='hdb') && !hasDate){
+    h += `<div style="background:rgba(74,159,212,0.08);border:1px solid rgba(74,159,212,0.2);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--blue2)">
+      💡 <strong>Set a Start Date above</strong> — each step will show its exact date, how many days away it is, and the amount due.
+    </div>`;
+  }
+
+  h += '<div style="display:flex;flex-direction:column;border:1px solid var(--border);border-radius:10px;overflow:hidden">';
+
+  items.forEach((item, idx) => {
+    const sd = item.msKey ? stepDates[item.msKey] : null;
+    const isPast   = sd ? Math.round((sd.date-today)/86400000)<0 : false;
+    const isUrgent = sd ? (!item.fixed && Math.round((sd.date-today)/86400000)>=0 && Math.round((sd.date-today)/86400000)<=14) : false;
+
+    const dotColors = {blue:'var(--blue2)',gold:'var(--gold)',red:'var(--red)',teal:'var(--teal)',green:'var(--green)',amber:'var(--amber)',purple:'var(--purple)'};
+    const dotC  = dotColors[item.color] || 'var(--text3)';
+    const rowBg = isUrgent ? 'rgba(229,92,92,0.05)' : idx%2===0 ? 'var(--bg3)' : 'transparent';
+    const isLast = idx===items.length-1;
+    const amtStr = sd ? sd.amount : '';
+    const noteStr= sd ? sd.note   : item.days;
+
+    h += `<div data-offset-idx="${item.offsetIdx!==undefined?item.offsetIdx:''}" style="border-bottom:${isLast?'none':'1px solid var(--border)'};background:${rowBg}">
+      <div style="display:flex;gap:12px;padding:14px 16px;cursor:pointer;align-items:flex-start"
+           onclick="var d=this.nextElementSibling;var open=d.style.display!=='none';d.style.display=open?'none':'block';this.querySelector('.chev').textContent=open?'▼':'▲'">
+        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+          <div style="width:12px;height:12px;border-radius:50%;background:${isPast?'var(--border2)':dotC};border:2.5px solid ${isPast?'var(--border2)':dotC};margin-top:3px;flex-shrink:0"></div>
+          ${!isLast?`<div style="width:2px;flex:1;min-height:28px;background:var(--border);margin-top:4px"></div>`:''}
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
+            <span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:10px;background:${isPast?'var(--bg4)':dotC+'20'};color:${isPast?'var(--text3)':dotC};border:1px solid ${isPast?'var(--border)':dotC+'50'};white-space:nowrap;flex-shrink:0">${item.step}</span>
+            <span style="font-size:13px;font-weight:600;color:${isPast?'var(--text3)':'var(--text)'};flex:1;line-height:1.35">${item.title}</span>
+            ${amtStr && amtStr!=='—'?`<span style="font-family:'Atkinson Hyperlegible',monospace;font-size:12.5px;font-weight:700;color:${isPast?'var(--text3)':dotC};white-space:nowrap;flex-shrink:0">${amtStr}</span>`:''}
+            <span class="chev" style="font-size:11px;color:var(--text3);flex-shrink:0;margin-left:4px">▼</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            ${sd ? datePill(sd.date, item.fixed) : `<span style="font-size:10.5px;color:var(--text3);font-style:italic">${item.days}</span>`}
+          </div>
+          ${sd && noteStr ? `<div style="font-size:10.5px;color:var(--text3);margin-top:4px;line-height:1.5">${noteStr}</div>` : ''}
+        </div>
       </div>
-      <div class="tl-body">${item.body}
-        ${item.pitfall?`<div class="tl-pitfall">${item.pitfall}</div>`:''}
-        ${item.tip?`<div class="tl-tip">${item.tip}</div>`:''}
+      <div style="display:none;padding:0 16px 14px 42px;border-top:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--text2);line-height:1.75;padding-top:10px">${item.body}</div>
+        ${item.pitfall?`<div style="margin-top:9px;padding:9px 12px;background:rgba(229,92,92,0.07);border-left:3px solid var(--red);border-radius:0 6px 6px 0;font-size:11.5px;line-height:1.65"><strong style="color:var(--red)">⚠ Pitfall:</strong> ${item.pitfall}</div>`:''}
+        ${item.tip?`<div style="margin-top:7px;padding:9px 12px;background:rgba(46,196,169,0.07);border-left:3px solid var(--teal);border-radius:0 6px 6px 0;font-size:11.5px;line-height:1.65"><strong style="color:var(--teal)">💡 Tip:</strong> ${item.tip}</div>`:''}
+        ${item.offsetIdx!==undefined?`<div style="margin-top:10px;padding:8px 10px;background:var(--bg4);border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11.5px;color:var(--text3)">
+          <span>Adjust estimated date by:</span>
+          <button onclick="event.stopPropagation();adjustDateOffset(${item.offsetIdx},-1)" style="width:24px;height:24px;border-radius:5px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:14px;cursor:pointer;font-weight:700">−</button>
+          <input type="number" id="offset-input-${item.offsetIdx}" value="${_dateOffsets[item.offsetIdx]||0}"
+            style="width:48px;text-align:center;padding:3px 6px;background:var(--bg3);border:1px solid var(--blue2);border-radius:5px;color:var(--text);font-size:12px;font-family:'Atkinson Hyperlegible',monospace;outline:none"
+            onblur="setDateOffset(${item.offsetIdx},parseInt(this.value)||0)"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();setDateOffset(${item.offsetIdx},parseInt(this.value)||0);this.blur();}">
+          <button onclick="event.stopPropagation();adjustDateOffset(${item.offsetIdx},1)" style="width:24px;height:24px;border-radius:5px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:14px;cursor:pointer;font-weight:700">+</button>
+          <span style="color:var(--text3)">days</span>
+          <span style="margin-left:4px;font-size:10.5px;color:var(--text3);font-style:italic">All downstream dates update automatically</span>
+        </div>`:''}
       </div>
-    </div></div>`;
+    </div>`;
   });
-  h+='</div>';
-  document.getElementById('timeline-container').innerHTML=h;
+
+  h += '</div>';
+
+  if((propType==='resalecondo'||propType==='hdb') && hasDate){
+    h += `<div style="margin-top:10px;font-size:11px;color:var(--text3);line-height:1.6;padding:10px;background:var(--bg4);border-radius:6px">ⓘ Dates are indicative based on your start date. Legal deadlines (BSD, ABSD) are strictly enforced. Always confirm with your conveyancing lawyer.</div>`;
+  }
+
+  container.innerHTML = h;
+  // Re-open the row that was being adjusted
+  if(reopenOffsetIdx !== undefined){
+    const target = container.querySelector('[data-offset-idx="'+reopenOffsetIdx+'"]');
+    if(target){
+      const detail = target.querySelector('div:last-child');
+      const chev   = target.querySelector('.chev');
+      if(detail) detail.style.display = 'block';
+      if(chev)   chev.textContent = '▲';
+      // Scroll into view smoothly
+      setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'nearest'}), 50);
+    }
+  }
 }
 
 // ═══════════════════════════
@@ -5161,11 +5414,14 @@ window.addEventListener('load',()=>{
   // Init comma-formatted inputs
   initCommaInputs();
   // Default start date to today
+  const todayStr = new Date().toISOString().split('T')[0];
   const dateEl = document.getElementById('startDate');
-  if(dateEl && !dateEl.value){
-    const today = new Date();
-    dateEl.value = today.toISOString().split('T')[0];
-  }
+  if(dateEl && !dateEl.value) dateEl.value = todayStr;
+  const tlDateEl = document.getElementById('tl-start-date');
+  if(tlDateEl && !tlDateEl.value) tlDateEl.value = todayStr;
+  // Also sync to calc OTP date
+  const calcDateEl = document.getElementById('calc-otp-date');
+  if(calcDateEl && !calcDateEl.value) calcDateEl.value = todayStr;
   calculate();
   onAgeOrTenureChange(); // enforce correct tenure limits on load
   // pre-render all panels so switching is instant
