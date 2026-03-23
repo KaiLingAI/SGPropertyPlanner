@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- SG Property Planner v6.9 | 1774205074 -->
+<!-- SG Property Planner v7.1 | 1774249615 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1701,6 +1701,8 @@ let buyerCount = 1;
 let _calc = {};
 // User-edited deposit fees — synced between Downpayment card and Timeline
 let _deposit = { optFee: null, exFee: null }; // null = use auto-calculated defaults
+let _completionDateRC  = null; // null = auto-calculate; Date = user override for resale condo completion
+let _completionDateHDB = null; // null = auto-calculate; Date = user override for HDB completion
 // User-edited date offsets for Transaction Date Planner (resalecondo + hdb only)
 // Keys match milestone index, values are day offsets from the auto-calculated date
 let _dateOffsets = {};
@@ -1771,6 +1773,8 @@ function updateDock(activeId){
 function setPropType(type,el){
   propType=type;
   _deposit = { optFee: null, exFee: null }; // reset when switching property type
+  _completionDateRC  = null;
+  _completionDateHDB = null;
   _dateOffsets = {}; // reset date offsets on property type switch
   document.querySelectorAll('.prop-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
@@ -2254,7 +2258,10 @@ function calculate(){
   const maxLoan = Math.round(baseVal*ltvPct);
   const totalDP = price - maxLoan;
   // minCash = mandatory cash on lower-of-val portion + full COV (can't use CPF/loan for COV)
-  const minCash = Math.round(baseVal*minCashPct) + cov;
+  let minCash = Math.round(baseVal*minCashPct) + cov;
+  // HDB regulation: OTP deposit (option fee + exercise fee) = min $5,000 cash
+  // This is mandatory regardless of loan type
+  if(propType==='hdb') minCash = Math.max(minCash, 5000 + cov);
   const cpfUsable = Math.max(0, totalDP - minCash);
 
   // Monthly repayment
@@ -2391,6 +2398,9 @@ function calculate(){
   renderDPSchedule();
   recalcFunds(); // keep Cash & CPF planner in sync
   updateHDBLeaseCalc(); // update HDB lease age guide
+  // Refresh deposit fees from live DP card if rendered
+  if(propType==='resalecondo' && document.getElementById('condo-opt-pct')) recalcCondoDep();
+  if(propType==='hdb'         && document.getElementById('hdb-opt-amt'))   recalcHDBDep(null);
   // refresh grant calculator if HDB tab
   if(propType==='hdb') calcGrants();
 }
@@ -2679,7 +2689,23 @@ function setDateOffset(idx, val){
 }
 function resetDateOffsets(){
   _dateOffsets = {};
+  _completionDateRC  = null;
+  _completionDateHDB = null;
   renderTimeline();
+}
+function setCompletionDate(val){
+  if(!val){ clearCompletionDate(); return; }
+  const d = new Date(val);
+  if(isNaN(d.getTime())) return;
+  if(propType==='hdb')     _completionDateHDB = d;
+  else if(propType==='resalecondo') _completionDateRC  = d;
+  renderTimeline(7); // re-open completion row (offsetIdx 7 for HDB, 5 for RC)
+}
+function clearCompletionDate(){
+  _completionDateRC  = null;
+  _completionDateHDB = null;
+  const idx = propType==='hdb' ? 7 : 5;
+  renderTimeline(idx);
 }
 
 function toggleInterest(){
@@ -3426,7 +3452,7 @@ const TIMELINES={
      pitfall:'Late BSD payment incurs IRAS penalties up to 4× the stamp duty amount.',
      tip:'Most HDB buyers pay BSD via CPF OA. Check your CPF OA balance before exercising the OTP.'},
     {step:'Step 4',title:'Submit Resale Application — Both Parties',days:'Within 7 days of exercise',color:'teal',msKey:'submit',fixed:true,
-     body:'Both buyer and seller log into HDB Flat Portal (My Flat Dashboard) and submit their respective portions of the resale application within 7 calendar days of each other. Admin fee: $80 per party (3-room and above). HDB accepts the application within 28 working days (~6 weeks) and notifies both parties via SMS/email. This acceptance date starts the 8-week countdown to completion.',
+     body:'Both buyer and seller log into HDB Flat Portal (My Flat Dashboard) and submit their respective portions of the resale application within 7 calendar days of each other. Admin fee: $80 per party — you pay $80 as buyer; seller pays their own $80 separately. HDB accepts the application within 28 working days (~6 weeks) and notifies both parties via SMS/email. This acceptance date starts the 8-week countdown to completion.',
      pitfall:'If either party submits more than 7 days after the other, the application is void and must restart from scratch.',
      tip:'Submit on the same day you exercise the OTP. Check HDB portal daily after submission.'},
     {step:'Step 5',title:'Endorse Documents & HDB Approval',days:'~3 weeks after acceptance (adjustable)',color:'teal',msKey:'approval',offsetIdx:6,
@@ -3455,8 +3481,17 @@ function renderTimeline(reopenOffsetIdx){
 
   const r = _calc;
   const price  = r.price||0, bsd = r.bsd||0, absd = r.absd||0, maxLoan = r.maxLoan||0;
-  const optFee = _deposit.optFee !== null ? _deposit.optFee : (propType==='hdb' ? Math.min(1000,Math.round(price*.01)) : Math.round(price*.01));
-  const exFee  = _deposit.exFee  !== null ? _deposit.exFee  : (propType==='hdb' ? Math.min(4000,5000-optFee) : Math.round(price*.04));
+  // Read live DP card values if available; otherwise use _deposit cache; otherwise default
+  const _liveOptPct = parseFloat(document.getElementById('condo-opt-pct')?.value||'1');
+  const _liveExPct  = parseFloat(document.getElementById('condo-ex-pct')?.value||'4');
+  const _liveOptAmt = document.getElementById('condo-opt-amt')?.style.display!=='none' ? parseFloat(document.getElementById('condo-opt-amt')?.value||'0') : null;
+  const _liveExAmt  = document.getElementById('condo-ex-amt')?.style.display!=='none'  ? parseFloat(document.getElementById('condo-ex-amt')?.value||'0')  : null;
+  const optFee = propType==='hdb'
+    ? (_deposit.optFee !== null ? _deposit.optFee : Math.min(1000, Math.round(price*.01)))
+    : (_liveOptAmt !== null ? _liveOptAmt : (_liveOptPct ? Math.round(price*_liveOptPct/100) : (_deposit.optFee !== null ? _deposit.optFee : Math.round(price*.01))));
+  const exFee  = propType==='hdb'
+    ? (_deposit.exFee  !== null ? _deposit.exFee  : Math.min(4000, 5000-optFee))
+    : (_liveExAmt  !== null ? _liveExAmt  : (_liveExPct  ? Math.round(price*_liveExPct/100)  : (_deposit.exFee  !== null ? _deposit.exFee  : Math.round(price*.04))));
   const fmt2   = n => '$'+Math.round(n||0).toLocaleString('en-SG');
 
   const startStr = document.getElementById('tl-start-date')?.value || document.getElementById('startDate')?.value;
@@ -3477,7 +3512,8 @@ function renderTimeline(reopenOffsetIdx){
     const optPeriod  = 14 + (_dateOffsets[2]||0);       // option period: 14 days default, adjustable
     const exercise   = addD(start, optPeriod);           // exercise = end of option period
     const bsdDue     = addD(exercise, 14);               // FIXED by law: 14 days after exercise
-    const completion = addD(exercise, 70 + (_dateOffsets[5]||0)); // 10 weeks default, adjustable
+    const completionDefault = addD(exercise, 70 + (_dateOffsets[5]||0)); // 10 weeks default
+    const completion = _completionDateRC || completionDefault;
     stepDates = {
       otp:        {date:start,             amount:fmt2(optFee),     note:'Cash only · non-refundable · appoint lawyer same day'},
       diligence:  {date:addD(start,1),     amount:'~$350–700',      note:'Bank valuation + title searches during '+optPeriod+'-day option period · option period adjustable above'},
@@ -3495,12 +3531,13 @@ function renderTimeline(reopenOffsetIdx){
     const hdbSubmit   = addD(exercise, 3);                // submit within 7 days — assume 3 days
     const acceptance  = addD(hdbSubmit, 42);              // HDB acceptance ~28 working days (~6 weeks)
     const endorse     = addD(acceptance, 21 + (_dateOffsets[6]||0)); // endorse ~3 weeks after acceptance
-    const completion  = addD(acceptance, 56 + (_dateOffsets[7]||0)); // completion ~8 weeks from acceptance
+    const completionDefault2 = addD(acceptance, 56 + (_dateOffsets[7]||0)); // ~8 weeks from acceptance
+    const completion  = _completionDateHDB || completionDefault2;
     stepDates = {
       otp:        {date:start,      amount:fmt2(optFee),      note:'Cash only · max $1,000 · submit Request for Value same day ($120)'},
       exercise:   {date:exercise,   amount:fmt2(exFee),       note:'Cash only · total deposit max $5,000 · 4pm on day 21'},
       bsd:        {date:bsdDue,     amount:fmt2(bsd),         note:'Fixed by law: 14 days after exercise · CPF OA or cash'},
-      submit:     {date:hdbSubmit,  amount:'$80 admin',       note:'Both parties submit within 7 days of each other · HDB accepts within ~28 working days'},
+      submit:     {date:hdbSubmit,  amount:'$80 (buyer)',       note:'Both parties submit within 7 days of each other · HDB accepts within ~28 working days'},
       approval:   {date:endorse,    amount:'—',               note:'Endorse docs via My Flat Dashboard · pay fees · HDB grants approval'},
       completion: {date:completion, amount:fmt2(maxLoan),     note:'~8 weeks from acceptance · loan drawdown · CPF grants credited · keys collected'},
     };
@@ -3510,13 +3547,15 @@ function renderTimeline(reopenOffsetIdx){
   const datePill = (d, fixed) => {
     if(!d) return '';
     const dl = Math.round((d-today)/86400000);
+    const wk = Math.round(dl/7);
     const past = dl<0, urgent = !fixed && dl>=0 && dl<=14;
     const dateStr = fmtD(d);
+    const wkLabel = Math.abs(wk)===1 ? '1 week' : Math.abs(wk)+' weeks';
     let pill = '';
     if(past)        pill = `<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:var(--bg4);color:var(--text3);border:1px solid var(--border)">✓ Done</span>`;
-    else if(urgent) pill = `<span style="font-size:10px;padding:2px 7px;border-radius:8px;background:rgba(229,92,92,0.15);color:var(--red);border:1px solid rgba(229,92,92,0.4);font-weight:700">🔴 ${dl}d from today</span>`;
+    else if(urgent) pill = `<span style="font-size:10px;padding:2px 7px;border-radius:8px;background:rgba(229,92,92,0.15);color:var(--red);border:1px solid rgba(229,92,92,0.4);font-weight:700">🔴 ${dl<7?dl+'d':wkLabel} from today</span>`;
     else if(dl<=30) pill = `<span style="font-size:10px;padding:2px 7px;border-radius:8px;background:rgba(229,162,40,0.12);color:var(--amber);border:1px solid rgba(229,162,40,0.3);font-weight:600">${dl} days from today</span>`;
-    else            pill = `<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:rgba(74,159,212,0.1);color:var(--blue2);border:1px solid rgba(74,159,212,0.25)">${dl} days from today</span>`;
+    else            pill = `<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:rgba(74,159,212,0.1);color:var(--blue2);border:1px solid rgba(74,159,212,0.25)">${wkLabel} from today</span>`;
     return `<span style="font-family:'Atkinson Hyperlegible','DM Mono',monospace;font-size:11.5px;font-weight:700;color:${past?'var(--text3)':'var(--text)'}">${dateStr}</span> ${pill}`;
   };
 
@@ -3569,17 +3608,33 @@ function renderTimeline(reopenOffsetIdx){
         <div style="font-size:12px;color:var(--text2);line-height:1.75;padding-top:10px">${item.body}</div>
         ${item.pitfall?`<div style="margin-top:9px;padding:9px 12px;background:rgba(229,92,92,0.07);border-left:3px solid var(--red);border-radius:0 6px 6px 0;font-size:11.5px;line-height:1.65"><strong style="color:var(--red)">⚠ Pitfall:</strong> ${item.pitfall}</div>`:''}
         ${item.tip?`<div style="margin-top:7px;padding:9px 12px;background:rgba(46,196,169,0.07);border-left:3px solid var(--teal);border-radius:0 6px 6px 0;font-size:11.5px;line-height:1.65"><strong style="color:var(--teal)">💡 Tip:</strong> ${item.tip}</div>`:''}
-        ${item.offsetIdx!==undefined?`<div style="margin-top:10px;padding:8px 10px;background:var(--bg4);border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11.5px;color:var(--text3)">
-          <span>Adjust estimated date by:</span>
-          <button onclick="event.stopPropagation();adjustDateOffset(${item.offsetIdx},-1)" style="width:24px;height:24px;border-radius:5px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:14px;cursor:pointer;font-weight:700">−</button>
-          <input type="number" id="offset-input-${item.offsetIdx}" value="${_dateOffsets[item.offsetIdx]||0}"
-            style="width:48px;text-align:center;padding:3px 6px;background:var(--bg3);border:1px solid var(--blue2);border-radius:5px;color:var(--text);font-size:12px;font-family:'Atkinson Hyperlegible',monospace;outline:none"
-            onblur="setDateOffset(${item.offsetIdx},parseInt(this.value)||0)"
-            onkeydown="if(event.key==='Enter'){event.preventDefault();setDateOffset(${item.offsetIdx},parseInt(this.value)||0);this.blur();}">
-          <button onclick="event.stopPropagation();adjustDateOffset(${item.offsetIdx},1)" style="width:24px;height:24px;border-radius:5px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:14px;cursor:pointer;font-weight:700">+</button>
-          <span style="color:var(--text3)">days</span>
-          <span style="margin-left:4px;font-size:10.5px;color:var(--text3);font-style:italic">All downstream dates update automatically</span>
-        </div>`:''}
+        ${item.offsetIdx!==undefined?(
+          item.msKey==='completion'?`
+          <div style="margin-top:10px;padding:10px 12px;background:var(--bg4);border-radius:6px;font-size:11.5px;color:var(--text3)">
+            <div style="font-weight:600;color:var(--text);margin-bottom:8px">📅 Set a specific completion date (optional)</div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+              <input type="date" id="completion-date-override"
+                value="${(propType==='hdb'?_completionDateHDB:_completionDateRC)?((propType==='hdb'?_completionDateHDB:_completionDateRC).toISOString().split('T')[0]):''}"
+                style="padding:6px 10px;background:var(--bg3);border:1px solid var(--blue2);border-radius:6px;color:var(--text);font-size:12px;outline:none"
+                oninput="event.stopPropagation();setCompletionDate(this.value)"
+                onchange="event.stopPropagation();setCompletionDate(this.value)">
+              <button onclick="event.stopPropagation();clearCompletionDate()" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border2);background:var(--bg3);color:var(--text3);font-size:11px;cursor:pointer">Reset to auto</button>
+            </div>
+            <div style="color:var(--text3);font-size:10.5px">Or shift by weeks: 
+              <button onclick="event.stopPropagation();adjustDateOffset(${item.offsetIdx},-7)" style="width:24px;height:24px;border-radius:4px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);cursor:pointer;font-weight:700">−</button>
+              <button onclick="event.stopPropagation();adjustDateOffset(${item.offsetIdx},7)" style="width:24px;height:24px;border-radius:4px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);cursor:pointer;font-weight:700">+</button>
+              <span style="margin-left:4px;font-style:italic">1 week at a time · all dates cascade</span>
+            </div>
+          </div>`
+          :`<div style="margin-top:10px;padding:8px 10px;background:var(--bg4);border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11.5px;color:var(--text3)">
+            <span>Adjust by:</span>
+            <button onclick="event.stopPropagation();adjustDateOffset(${item.offsetIdx},-7)" style="width:28px;height:24px;border-radius:4px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:11px;cursor:pointer;font-weight:700">−1w</button>
+            <button onclick="event.stopPropagation();adjustDateOffset(${item.offsetIdx},-1)" style="width:28px;height:24px;border-radius:4px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;cursor:pointer;font-weight:700">−</button>
+            <button onclick="event.stopPropagation();adjustDateOffset(${item.offsetIdx},1)" style="width:28px;height:24px;border-radius:4px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;cursor:pointer;font-weight:700">+</button>
+            <button onclick="event.stopPropagation();adjustDateOffset(${item.offsetIdx},7)" style="width:28px;height:24px;border-radius:4px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:11px;cursor:pointer;font-weight:700">+1w</button>
+            <span style="font-size:10.5px;font-style:italic">All dates cascade automatically</span>
+          </div>`
+        ):''}
       </div>
     </div>`;
   });
@@ -3639,7 +3694,7 @@ function renderCosts(){
     propTax:  Math.round(price*.04/12),
     movers:   1500,
     utilities:300,
-    hdbAdmin: isHDB?160:0,
+    hdbAdmin: isHDB?80:0,  // buyer's portion only ($80)
   };
 
   const totalFixed=bsd+absd+defaults.lawyer+defaults.mlegal+defaults.val+(isNewL?0:defaults.agent+defaults.agentGST)+defaults.mcst+defaults.fire;
@@ -3706,7 +3761,7 @@ function renderCosts(){
         MISCELLANEOUS / UPFRONT COSTS
         <span id="misc-toggle-icon" style="float:right;color:var(--blue2)">▼ hide</span>
       </td>
-    </tr>${isHDB?`<tr class="misc-item"><td>HDB Portal Admin Fee<br><span class="ct-note">$80 buyer + $80 seller</span></td><td style="text-align:right"><input class="editable-input" type="number" id="c-hdbadmin" value="160" oninput="updateCostTotal()"></td><td><span class="tag tag-req">Required</span><br><span class="ct-note">Upon submission</span></td></tr>`:''+((!isHDB&&!isLanded)?`<tr class="misc-item"><td>MCST Move-in Deposit<br><span class="ct-note">Refunded on vacating</span></td><td style="text-align:right"><input class="editable-input" type="number" id="c-mcst" value="${defaults.mcst}" oninput="updateCostTotal()"></td><td><span class="tag tag-opt">Refundable</span><br><span class="ct-note">Before move-in</span></td></tr>`:'')}
+    </tr>${isHDB?`<tr class="misc-item"><td>HDB Portal Admin Fee<br><span class="ct-note">Buyer portion only ($80)</span></td><td style="text-align:right"><input class="editable-input" type="number" id="c-hdbadmin" value="80" oninput="updateCostTotal()"></td><td><span class="tag tag-req">Required</span><br><span class="ct-note">Upon submission</span></td></tr>`:''+((!isHDB&&!isLanded)?`<tr class="misc-item"><td>MCST Move-in Deposit<br><span class="ct-note">Refunded on vacating</span></td><td style="text-align:right"><input class="editable-input" type="number" id="c-mcst" value="${defaults.mcst}" oninput="updateCostTotal()"></td><td><span class="tag tag-opt">Refundable</span><br><span class="ct-note">Before move-in</span></td></tr>`:'')}
     <tr class="misc-item"><td>Fire Insurance (first year)<br><span class="ct-note">Mandatory under mortgage</span></td><td style="text-align:right"><input class="editable-input" type="number" id="c-fire" value="${defaults.fire}" oninput="updateCostTotal()"></td><td><span class="tag tag-req">Mandatory</span><br><span class="ct-note">Annual</span></td></tr>
     <tr class="misc-item"><td>Home Contents / Buildings Insurance<br><span class="ct-note">${isLanded?'Buildings insurance essential':'Covers contents loss/damage'}</span></td><td style="text-align:right"><input class="editable-input" type="number" id="c-home" value="${defaults.homeIns}" oninput="updateCostTotal()"></td><td><span class="tag tag-opt">Recommended</span><br><span class="ct-note">Annual</span></td></tr>
     <tr class="misc-item"><td>Movers / Relocation<br><span class="ct-note">Estimate; varies by volume</span></td><td style="text-align:right"><input class="editable-input" type="number" id="c-movers" value="${defaults.movers}" oninput="updateCostTotal()"></td><td><span class="tag tag-var">Variable</span><br><span class="ct-note">Move-in</span></td></tr>
@@ -3756,7 +3811,7 @@ function calcStages(r,d){
       {name:'Option Fee (max $1,000) · Cash only',cash:1000,cpf:0,loan:0},
       {name:'Exercise Fee (up to $4,000) · Cash only',cash:4000,cpf:0,loan:0},
       {name:'Valuation report · Cash',cash:120,cpf:0,loan:0},
-      {name:'HDB admin fee (buyer) · Cash',cash:80,cpf:0,loan:0},
+      {name:'HDB Portal admin fee (buyer only) · Cash',cash:80,cpf:0,loan:0},
       // BSD: HDB loan = 100% CPF allowed; Bank loan = split
       {name:'BSD (Buyer Stamp Duty)',cash:loanSrcR==='hdb'?0:Math.round(bsd*.3),cpf:loanSrcR==='hdb'?bsd:Math.round(bsd*.7),loan:0},
       {name:'Remaining downpayment',cash:Math.max(0,minCash-5000-cov_val),cpf:cpfUsable,loan:0},
@@ -3854,7 +3909,7 @@ function renderHDBTimeline(){
   const optFee=1000; // market norm is $1,000
   const exFee=4000;  // up to $4,000; total deposit ≤ $5,000
   const valFee=120;
-  const adminFee=160;
+  const adminFee=80; // buyer's share only
   const maxLoan=r.maxLoan||Math.round(price*.80);
   const minDP=price-maxLoan;
   const grants=80000; // illustrative
