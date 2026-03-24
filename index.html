@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <!-- SG Property Planner v8.0 | 2026 Overhaul -->
 <html lang="en">
 <head>
@@ -89,8 +89,8 @@ html{background:var(--bg)}body{background:var(--bg);color:var(--text);font-size:
  
 /* ── Property type tabs ── */
 #prop-type-bar{display:flex;gap:6px;margin-bottom:0;flex-wrap:wrap}
-#calc-sticky-top{position:sticky;top:var(--topbar-h);z-index:400;background:var(--bg2);padding:14px 18px 10px;margin:-20px -18px 14px;border-bottom:1px solid var(--border);}
-.ptab{padding:7px 14px;border-radius:var(--radius2);border:1px solid var(--border2);color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;background:var(--bg3)}
+#calc-sticky-top{position:sticky;top:var(--topbar-h);z-index:400;background:var(--bg2);padding:12px 18px 10px;margin:-20px -18px 12px;border-bottom:1px solid var(--border);}
+.ptab{padding:6px 12px;border-radius:var(--radius2);border:1px solid var(--border2);color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;background:var(--bg3);white-space:nowrap;flex-shrink:0}
 .ptab:hover{color:var(--text2);border-color:var(--border3)}
 .ptab.active{color:var(--gold);border-color:rgba(200,169,110,0.5);background:var(--gold3)}
  
@@ -106,11 +106,12 @@ html{background:var(--bg)}body{background:var(--bg);color:var(--text);font-size:
 .field-input{width:100%;padding:10px 12px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--radius2);color:var(--text);font-size:13.5px;font-family:var(--font);outline:none;transition:border-color .2s}
 .field-input:focus{border-color:var(--blue2)}
 .field-input[type=range]{padding:4px 0;background:transparent;border:none;cursor:pointer}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--text3);cursor:pointer;border:2px solid var(--bg2)}
 .field-note{font-size:10.5px;color:var(--text3);margin-top:3px}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
  
 /* ── Tooltip ── */
-.tip-icon{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--bg4);border:1px solid var(--border2);color:var(--text3);font-size:9px;cursor:help;flex-shrink:0;position:relative}
+.tip-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--bg4);border:1px solid var(--border2);color:var(--text3);font-size:9px;cursor:help;flex-shrink:0;position:relative;overflow:visible}
 .tip-icon:hover::after{content:attr(data-tip);position:absolute;left:20px;top:-4px;white-space:normal;width:220px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--radius2);padding:8px 10px;font-size:11px;color:var(--text2);z-index:999;line-height:1.5;font-style:normal;box-shadow:var(--shadow)}
  
 /* ── Result tiles (right pane) ── */
@@ -237,9 +238,10 @@ html{background:var(--bg)}body{background:var(--bg);color:var(--text);font-size:
   #calc-right{width:100%;padding:14px 14px 20px}
   #calc-sticky-top{top:var(--topbar-h);margin:-14px -14px 12px;padding:10px 14px 8px}
   .topbar-tabs{display:none}
-  body{padding-bottom:70px}
-  #agent-fab{bottom:76px}
-  #agent-card-popup{bottom:140px}
+  body{padding-bottom:72px}
+  #mobile-nav{display:flex!important}
+  #agent-fab{bottom:80px}
+  #agent-card-popup{bottom:144px}
 }
 @media(max-width:600px){
   #topbar{padding:0 10px;gap:6px}
@@ -260,7 +262,7 @@ html{background:var(--bg)}body{background:var(--bg);color:var(--text);font-size:
 #agent-fab{position:fixed;bottom:24px;right:24px;z-index:9000;width:54px;height:54px;border-radius:50%;background:var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(200,169,110,0.5);transition:transform .2s,box-shadow .2s;animation:fabpulse 3s ease-in-out infinite}
 #agent-fab:hover{transform:scale(1.08);animation:none}
 #agent-fab-dot{position:absolute;bottom:2px;right:2px;width:13px;height:13px;border-radius:50%;background:#25D366;border:2px solid var(--bg2)}
-#agent-card-popup{display:none;position:fixed;bottom:88px;right:18px;z-index:9001;width:min(280px,calc(100vw - 36px));background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:16px;box-shadow:0 8px 40px rgba(0,0,0,0.55)}
+#agent-card-popup{display:none;position:fixed;bottom:84px;right:16px;z-index:9001;width:min(240px,calc(100vw - 32px));background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:13px;box-shadow:0 8px 40px rgba(0,0,0,0.55)}
 @keyframes fabpulse{0%,100%{box-shadow:0 4px 20px rgba(200,169,110,0.4)}50%{box-shadow:0 4px 32px rgba(200,169,110,0.7),0 0 0 8px rgba(200,169,110,0.12)}}
 @media(max-width:900px){#agent-fab{bottom:74px}#agent-card-popup{bottom:136px}}
 /* ── Mobile nav ── */
@@ -276,7 +278,7 @@ html{background:var(--bg)}body{background:var(--bg);color:var(--text);font-size:
   #content{overflow:visible;height:auto;flex:none}
   .panel{overflow:visible;flex:none}
   .panel.active{display:block;height:auto}
-  #panel-calc.active{display:flex;flex-direction:column}
+  #panel-calc.active{display:flex}
   #calc-left{width:100%;border-right:none;border-bottom:1px solid var(--border);height:auto;overflow-y:visible;padding:14px}
   #calc-right{width:100%;height:auto;overflow-y:visible;padding:14px}
   .topbar-tabs{display:none}
@@ -290,7 +292,7 @@ html{background:var(--bg)}body{background:var(--bg);color:var(--text);font-size:
 /* ── Misc ── */
 select.field-input option{background:var(--bg4);color:var(--text)}
 input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--bg4);border-radius:2px;outline:none;border:none!important;padding:0!important}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--blue2);cursor:pointer;border:2px solid var(--bg3)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--border2);cursor:pointer;border:1px solid var(--border3)}
 .divider{height:1px;background:var(--border);margin:16px 0}
 .tag{display:inline-block;font-size:10px;padding:1px 7px;border-radius:8px;font-weight:600}
 .tag-green{background:rgba(76,175,125,0.15);color:var(--green);border:1px solid rgba(76,175,125,0.3)}
@@ -359,9 +361,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
  
   <!-- LEFT: Inputs -->
   <div id="calc-left">
-    <div id="calc-sticky-top">
-      <div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:8px">SG Property Calculator · 2026 MAS / HDB / CPF Compliant</div>
-      <div id="prop-type-bar">
+    <div id="calc-sticky-top">      <div id="prop-type-bar">
         <div class="ptab active" id="pt-newlaunch" onclick="setPropType('newlaunch',this)">New Launch</div>
         <div class="ptab" id="pt-resalecondo" onclick="setPropType('resalecondo',this)">Resale Condo</div>
         <div class="ptab" id="pt-hdb" onclick="setPropType('hdb',this)">Resale HDB</div>
@@ -406,7 +406,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
       </div>
       <div class="field">
         <div class="field-label">Buyer 1 Age</div>
-        <input class="field-input" type="number" id="b1-age" value="35" min="21" max="65" oninput="calculate()">
+        <input class="field-input" type="number" id="b1-age" value="35" min="21" max="65" oninput="onAgeOrTenureChange()">
       </div>
     </div>
  
@@ -473,9 +473,9 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
     <!-- Advanced settings accordion -->
     <div class="accordion-trigger" onclick="toggleAdv(this)">
       <span>⚙</span> Advanced Settings
-      <span class="chev">▼</span>
+      <span class="chev">▲</span>
     </div>
-    <div class="accordion-body" id="adv-body">
+    <div class="accordion-body" id="adv-body" style="display:block">
       <div class="field">
         <div class="field-label">Loan Source</div>
         <select class="field-input" id="loanSource" onchange="onLoanSourceChange();calculate()">
@@ -529,7 +529,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
       <div class="card-body">
         <div class="field-row">
           <div class="field" style="margin-bottom:0">
-            <div class="field-label">MCST / Maintenance</div>
+            <div class="field-label" id="mcst-label">MCST / Maintenance</div>
             <input class="field-input" type="text" id="mcst-fee" value="350" inputmode="numeric" oninput="fmtInput(this);calcHolding()">
           </div>
           <div class="field" style="margin-bottom:0">
@@ -552,7 +552,22 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
     <div id="hdb-grants-section" style="display:none;margin-top:14px">
       <div class="card">
         <div class="card-hdr"><span>🎁</span><span class="card-title">CPF Housing Grants</span><span class="tip-icon" data-tip="EHG: up to $120K for families, $60K for singles. PHG: for second-timer families. AHG: additional grant for lower income. All subject to income ceiling and flat type." style="margin-left:auto">?</span></div>
-        <div class="card-body" id="grants-body"></div>
+        <div class="card-body">
+          <div id="grants-elig-box" style="margin-bottom:8px;padding:8px 10px;background:var(--bg4);border-radius:var(--radius3);font-size:12px;color:var(--text2);line-height:1.8"></div>
+          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Override grant amounts (optional)</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+            <div><div style="font-size:10.5px;color:var(--text3);margin-bottom:3px">EHG ($)</div><input class="field-input" type="text" id="grant-ehg-override" placeholder="Auto" inputmode="numeric" oninput="fmtInput(this);calcGrants()" style="padding:6px 8px;font-size:12px;width:100%"></div>
+            <div><div style="font-size:10.5px;color:var(--text3);margin-bottom:3px">PHG ($)</div><input class="field-input" type="text" id="grant-phg-override" placeholder="Auto" inputmode="numeric" oninput="fmtInput(this);calcGrants()" style="padding:6px 8px;font-size:12px;width:100%"></div>
+            <div><div style="font-size:10.5px;color:var(--text3);margin-bottom:3px">AHG ($)</div><input class="field-input" type="text" id="grant-ahg-override" placeholder="Auto" inputmode="numeric" oninput="fmtInput(this);calcGrants()" style="padding:6px 8px;font-size:12px;width:100%"></div>
+          </div>
+          <div id="grants-body"></div>
+          <div style="margin-top:8px;padding:8px 10px;background:var(--bg4);border-radius:var(--radius3);font-size:11.5px;color:var(--text2);line-height:1.65">
+            <strong style="color:var(--text);display:block;margin-bottom:4px">How grants are paid out</strong>
+            <div>EHG/AHG credited to CPF OA at key collection — reduces loan/cash needed.</div>
+            <div>PHG credited to CPF OA — offsets outstanding loan or purchase price.</div>
+            <div>On resale: grants + 2.5% p.a. accrued interest refunded to CPF OA.</div>
+          </div>
+        </div>
       </div>
     </div>
  
@@ -629,47 +644,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
       </div>
     </div>
  
-    <!-- Monthly mortgage -->
-    <div class="card">
-      <div class="card-hdr"><span>📅</span><span class="card-title">Monthly Repayment</span></div>
-      <div class="card-body">
-        <div style="font-size:32px;font-weight:700;color:var(--gold);letter-spacing:.02em;margin-bottom:4px" id="monthly-big">—</div>
-        <div style="font-size:11px;color:var(--text3);margin-bottom:12px" id="monthly-sub">per month</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
-          <div style="flex:1;min-width:100px;background:var(--bg4);border-radius:var(--radius3);padding:8px 10px">
-            <div style="font-size:10px;color:var(--text3);margin-bottom:2px">Total Interest</div>
-            <div style="font-size:13px;font-weight:600;color:var(--text)" id="total-interest">—</div>
-          </div>
-          <div style="flex:1;min-width:100px;background:var(--bg4);border-radius:var(--radius3);padding:8px 10px">
-            <div style="font-size:10px;color:var(--text3);margin-bottom:2px">Yr 1 Principal</div>
-            <div style="font-size:13px;font-weight:600;color:var(--teal)" id="chip-principal">—</div>
-          </div>
-          <div style="flex:1;min-width:100px;background:var(--bg4);border-radius:var(--radius3);padding:8px 10px">
-            <div style="font-size:10px;color:var(--text3);margin-bottom:2px">Yr 1 Interest</div>
-            <div style="font-size:13px;font-weight:600;color:var(--amber)" id="chip-interest">—</div>
-          </div>
-        </div>
-      </div>
-    </div>
- 
-    <!-- TDSR / MSR -->
-    <div class="card">
-      <div class="card-hdr"><span>📊</span><span class="card-title">Debt Ratios</span></div>
-      <div class="card-body">
-        <div class="ratio-bar-wrap">
-          <div class="ratio-bar-row">
-            <div class="ratio-label">TDSR <span class="tip-icon" data-tip="Total Debt Servicing Ratio: all monthly loan repayments ÷ gross income. MAS cap: 55%.">?</span></div>
-            <div class="ratio-track"><div class="ratio-fill" id="tdsr-bar" style="width:0%"></div></div>
-            <div class="ratio-val" id="tdsr-val">0%</div>
-          </div>
-          <div class="ratio-bar-row" id="msr-row">
-            <div class="ratio-label">MSR <span class="tip-icon" data-tip="Mortgage Servicing Ratio: HDB mortgage ÷ gross income. HDB/EC only. MAS cap: 30%.">?</span></div>
-            <div class="ratio-track"><div class="ratio-fill" id="msr-bar" style="width:0%"></div></div>
-            <div class="ratio-val" id="msr-val">0%</div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- monthly+ratio combined — rendered after stage-card -->
  
     <!-- Doughnut chart -->
     <div class="card">
@@ -681,7 +656,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
     </div>
  
     <!-- Cash / CPF OA / Loan — sticky top of results -->
-    <div id="funds-card" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);margin-bottom:14px;position:sticky;top:0;z-index:50">
+    <div id="funds-card" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);margin-bottom:14px">
       <div class="card-hdr" style="cursor:pointer" onclick="(function(b,ch){const open=b.style.display!=='none';b.style.display=open?'none':'block';ch.textContent=open?'▼':'▲'})(document.getElementById('funds-body'),this.querySelector('.fchev'))">
         <span>⚖</span><span class="card-title">Cash / CPF OA / Loan Allocation</span>
         <span class="fchev" style="margin-left:auto;font-size:11px;color:var(--text3)">▼</span>
@@ -714,6 +689,42 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
       <div class="card-body" id="stage-body"></div>
     </div>
  
+    <!-- Monthly Repayment + Debt Ratios — combined -->
+    <div class="card" id="monthly-ratio-card">
+      <div class="card-hdr"><span>📅</span><span class="card-title">Monthly Repayment &amp; Debt Ratios</span></div>
+      <div class="card-body">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+          <div>
+            <div style="font-size:30px;font-weight:700;color:var(--gold);letter-spacing:.02em;line-height:1.1" id="monthly-big">—</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:3px" id="monthly-sub">per month</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div style="background:var(--bg4);border-radius:var(--radius3);padding:7px 12px">
+              <div style="font-size:10px;color:var(--text3);margin-bottom:2px">Yr 1 Principal</div>
+              <div style="font-size:12.5px;font-weight:600;color:var(--teal)" id="chip-principal">—</div>
+            </div>
+            <div style="background:var(--bg4);border-radius:var(--radius3);padding:7px 12px">
+              <div style="font-size:10px;color:var(--text3);margin-bottom:2px">Yr 1 Interest</div>
+              <div style="font-size:12.5px;font-weight:600;color:var(--amber)" id="chip-interest">—</div>
+            </div>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:8px">
+          <div id="tdsr-row" style="display:flex;align-items:center;gap:10px">
+            <div style="font-size:11px;color:var(--text3);width:40px;flex-shrink:0">TDSR <span class="tip-icon" data-tip="Total Debt Servicing Ratio: all debt repayments ÷ gross income. MAS cap: 55%.">?</span></div>
+            <div class="ratio-track" style="flex:1"><div class="ratio-fill" id="tdsr-bar" style="width:0%"></div></div>
+            <div style="font-size:12px;font-weight:700;width:38px;text-align:right;color:var(--text)" id="tdsr-val">—</div>
+          </div>
+          <div id="msr-row" style="display:flex;align-items:center;gap:10px">
+            <div style="font-size:11px;color:var(--text3);width:40px;flex-shrink:0">MSR <span class="tip-icon" data-tip="Mortgage Servicing Ratio: HDB mortgage ÷ gross income. Cap: 30%.">?</span></div>
+            <div class="ratio-track" style="flex:1"><div class="ratio-fill" id="msr-bar" style="width:0%"></div></div>
+            <div style="font-size:12px;font-weight:700;width:38px;text-align:right;color:var(--text)" id="msr-val">—</div>
+          </div>
+        </div>
+        <span id="total-interest" style="display:none"></span>
+      </div>
+    </div>
+ 
     <!-- Free CTA (no lock) -->
     <div style="background:linear-gradient(135deg,rgba(200,169,110,0.08),rgba(74,159,212,0.05));border:1px solid rgba(200,169,110,0.25);border-radius:var(--radius);padding:16px 18px;margin-top:8px">
       <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:4px">Want a personalised plan?</div>
@@ -727,13 +738,15 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
      PANEL: TIMELINE
 ══════════════════════════════════════════ -->
 <div class="panel" id="panel-timeline">
-  <div class="panel-scroll">
-    <div id="tl-tab-bar" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+  <div style="position:sticky;top:var(--topbar-h);z-index:400;background:var(--bg2);padding:10px 22px 8px;border-bottom:1px solid var(--border)">
+    <div id="tl-tab-bar" style="display:flex;gap:5px;flex-wrap:nowrap;overflow-x:auto;align-items:center;-webkit-overflow-scrolling:touch">
       <div class="tl-type-tab active" id="tlt-newlaunch" onclick="setPropType('newlaunch',document.getElementById('pt-newlaunch'));showPane('timeline')">New Launch</div>
       <div class="tl-type-tab" id="tlt-resalecondo" onclick="setPropType('resalecondo',document.getElementById('pt-resalecondo'));showPane('timeline')">Resale Condo</div>
       <div class="tl-type-tab" id="tlt-hdb" onclick="setPropType('hdb',document.getElementById('pt-hdb'));showPane('timeline')">Resale HDB</div>
       <div class="tl-type-tab" id="tlt-landed" onclick="setPropType('landed',document.getElementById('pt-landed'));showPane('timeline')">Landed</div>
     </div>
+  </div>
+  <div class="panel-scroll">
     <div style="margin-bottom:14px">
       <div class="section-title" id="tl-title">New Launch Condo Timeline</div>
       <div class="section-sub" id="tl-sub" style="margin-top:3px">5% booking → S&amp;P 15% → Progressive payments → TOP → CSC · click each step to expand</div>
@@ -930,103 +943,55 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
     </div>
   </div>
   <div class="panel-scroll">
-    <div style="background:rgba(200,169,110,0.08);border:1px solid rgba(200,169,110,0.25);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <div style="font-size:13px;color:var(--text2);flex:1">Rates change frequently. Click any rate card to discuss your options with Kai Ling directly — she will provide the latest rates and help you find the best package.</div>
-      <a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="padding:9px 16px;background:#25D366;border-radius:var(--radius2);color:#fff;font-size:12.5px;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0">💬 Ask Kai Ling</a>
+    <div style="background:rgba(200,169,110,0.08);border:1px solid rgba(200,169,110,0.25);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div style="font-size:12.5px;color:var(--text2);flex:1">Indicative rates as at March 2026. Actual rates vary by bank, LTV, and credit profile. Click any rate to WhatsApp Kai Ling for the latest packages.</div>
+      <a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="padding:8px 14px;background:#25D366;border-radius:var(--radius2);color:#fff;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0">&#128172; Ask Kai Ling</a>
     </div>
- 
-    <!-- Fixed Rate Packages -->
     <div class="card" style="margin-bottom:12px">
-      <div class="card-hdr"><span>🔒</span><span class="card-title">Fixed Rate Packages</span><span class="tip-icon" data-tip="Fixed rates give certainty for the lock-in period (typically 2-3 years). After lock-in, revert to board rate or refinance." style="margin-left:auto">?</span></div>
-      <div class="card-body" style="padding:0">
-        <div id="rates-fixed-list">
-          <a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);text-decoration:none;transition:background .15s" onmouseover="this.style.background='var(--bg4)'" onmouseout="this.style.background=''">
-            <div><div style="font-size:13px;font-weight:600;color:var(--text)">2-Year Fixed</div><div style="font-size:11.5px;color:var(--text3);margin-top:2px">2-year lock-in · then board rate or refinance</div></div>
-            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px;font-weight:800;color:var(--teal)">~1.45% p.a.</span><span style="font-size:10px;padding:2px 8px;background:rgba(46,196,169,0.12);border:1px solid rgba(46,196,169,0.3);border-radius:8px;color:var(--teal)">Ask Kai Ling →</span></div>
-          </a><a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);text-decoration:none;transition:background .15s" onmouseover="this.style.background='var(--bg4)'" onmouseout="this.style.background=''">
-            <div><div style="font-size:13px;font-weight:600;color:var(--text)">3-Year Fixed</div><div style="font-size:11.5px;color:var(--text3);margin-top:2px">3-year lock-in · popular for stability</div></div>
-            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px;font-weight:800;color:var(--teal)">~1.55% p.a.</span><span style="font-size:10px;padding:2px 8px;background:rgba(46,196,169,0.12);border:1px solid rgba(46,196,169,0.3);border-radius:8px;color:var(--teal)">Ask Kai Ling →</span></div>
-          </a><a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);text-decoration:none;transition:background .15s" onmouseover="this.style.background='var(--bg4)'" onmouseout="this.style.background=''">
-            <div><div style="font-size:13px;font-weight:600;color:var(--text)">5-Year Fixed</div><div style="font-size:11.5px;color:var(--text3);margin-top:2px">5-year certainty · higher initial rate</div></div>
-            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px;font-weight:800;color:var(--teal)">~1.80% p.a.</span><span style="font-size:10px;padding:2px 8px;background:rgba(46,196,169,0.12);border:1px solid rgba(46,196,169,0.3);border-radius:8px;color:var(--teal)">Ask Kai Ling →</span></div>
-          </a>
-        </div>
+      <div class="card-hdr"><span>&#128274;</span><span class="card-title">Fixed Rate Packages</span></div>
+      <div class="card-body" style="padding:0;overflow-x:auto">
+        <table class="rate-table" style="min-width:500px">
+          <thead><tr><th>Bank</th><th>Package</th><th>Yr 1</th><th>Yr 2</th><th>Yr 3+</th><th>Lock-in</th><th></th></tr></thead>
+          <tbody><tr><td><strong>DBS</strong></td><td style="color:var(--text3);font-size:11.5px">Fixed + SORA blend</td><td style="color:var(--teal);font-weight:700">1.45%</td><td style="color:var(--teal);font-weight:600">1.55%</td><td style="color:var(--text2)">SORA+0.8%</td><td style="color:var(--text3);font-size:11.5px">2 yrs</td><td><a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="font-size:11px;padding:3px 8px;background:rgba(200,169,110,0.12);border:1px solid rgba(200,169,110,0.3);border-radius:8px;color:var(--gold);text-decoration:none;white-space:nowrap">Enquire &#8594;</a></td></tr><tr><td><strong>OCBC</strong></td><td style="color:var(--text3);font-size:11.5px">2-Yr Fixed</td><td style="color:var(--teal);font-weight:700">1.48%</td><td style="color:var(--teal);font-weight:600">1.58%</td><td style="color:var(--text2)">Board rate</td><td style="color:var(--text3);font-size:11.5px">2 yrs</td><td><a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="font-size:11px;padding:3px 8px;background:rgba(200,169,110,0.12);border:1px solid rgba(200,169,110,0.3);border-radius:8px;color:var(--gold);text-decoration:none;white-space:nowrap">Enquire &#8594;</a></td></tr><tr><td><strong>UOB</strong></td><td style="color:var(--text3);font-size:11.5px">Fixed Saver</td><td style="color:var(--teal);font-weight:700">1.45%</td><td style="color:var(--teal);font-weight:600">1.50%</td><td style="color:var(--text2)">SORA+0.75%</td><td style="color:var(--text3);font-size:11.5px">2 yrs</td><td><a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="font-size:11px;padding:3px 8px;background:rgba(200,169,110,0.12);border:1px solid rgba(200,169,110,0.3);border-radius:8px;color:var(--gold);text-decoration:none;white-space:nowrap">Enquire &#8594;</a></td></tr><tr><td><strong>Standard Chartered</strong></td><td style="color:var(--text3);font-size:11.5px">3-Yr Fixed</td><td style="color:var(--teal);font-weight:700">1.55%</td><td style="color:var(--teal);font-weight:600">1.60%</td><td style="color:var(--text2)">1.65%</td><td style="color:var(--text3);font-size:11.5px">3 yrs</td><td><a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="font-size:11px;padding:3px 8px;background:rgba(200,169,110,0.12);border:1px solid rgba(200,169,110,0.3);border-radius:8px;color:var(--gold);text-decoration:none;white-space:nowrap">Enquire &#8594;</a></td></tr><tr><td><strong>Maybank</strong></td><td style="color:var(--text3);font-size:11.5px">Fixed (3Y)</td><td style="color:var(--teal);font-weight:700">1.58%</td><td style="color:var(--teal);font-weight:600">1.62%</td><td style="color:var(--text2)">1.68%</td><td style="color:var(--text3);font-size:11.5px">3 yrs</td><td><a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="font-size:11px;padding:3px 8px;background:rgba(200,169,110,0.12);border:1px solid rgba(200,169,110,0.3);border-radius:8px;color:var(--gold);text-decoration:none;white-space:nowrap">Enquire &#8594;</a></td></tr><tr><td><strong>HSBC</strong></td><td style="color:var(--text3);font-size:11.5px">Fixed + SORA</td><td style="color:var(--teal);font-weight:700">1.50%</td><td style="color:var(--teal);font-weight:600">1.55%</td><td style="color:var(--text2)">SORA+0.8%</td><td style="color:var(--text3);font-size:11.5px">2 yrs</td><td><a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="font-size:11px;padding:3px 8px;background:rgba(200,169,110,0.12);border:1px solid rgba(200,169,110,0.3);border-radius:8px;color:var(--gold);text-decoration:none;white-space:nowrap">Enquire &#8594;</a></td></tr><tr><td><strong>Citibank</strong></td><td style="color:var(--text3);font-size:11.5px">5-Yr Fixed</td><td style="color:var(--teal);font-weight:700">1.75%</td><td style="color:var(--teal);font-weight:600">1.78%</td><td style="color:var(--text2)">1.80%</td><td style="color:var(--text3);font-size:11.5px">5 yrs</td><td><a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="font-size:11px;padding:3px 8px;background:rgba(200,169,110,0.12);border:1px solid rgba(200,169,110,0.3);border-radius:8px;color:var(--gold);text-decoration:none;white-space:nowrap">Enquire &#8594;</a></td></tr></tbody>
+        </table>
       </div>
     </div>
- 
-    <!-- Floating / SORA Packages -->
     <div class="card" style="margin-bottom:12px">
-      <div class="card-hdr"><span>📊</span><span class="card-title">Floating / SORA Packages</span><span class="tip-icon" data-tip="SORA (Singapore Overnight Rate Average) is the reference rate for floating mortgages. Rates reset monthly or quarterly. Lower when SORA is low, higher when it rises." style="margin-left:auto">?</span></div>
-      <div class="card-body" style="padding:0">
-        <a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);text-decoration:none;transition:background .15s" onmouseover="this.style.background='var(--bg4)'" onmouseout="this.style.background=''">
-            <div><div style="font-size:13px;font-weight:600;color:var(--text)">1M SORA + Spread</div><div style="font-size:11.5px;color:var(--text3);margin-top:2px">1-month SORA compounding · resets monthly · SORA ~1.20% Mar 2026</div></div>
-            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px;font-weight:800;color:var(--blue2)">~1.45–1.55%</span><span style="font-size:10px;padding:2px 8px;background:rgba(74,159,212,0.12);border:1px solid rgba(74,159,212,0.3);border-radius:8px;color:var(--blue2)">Ask Kai Ling →</span></div>
-          </a><a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);text-decoration:none;transition:background .15s" onmouseover="this.style.background='var(--bg4)'" onmouseout="this.style.background=''">
-            <div><div style="font-size:13px;font-weight:600;color:var(--text)">3M SORA + Spread</div><div style="font-size:11.5px;color:var(--text3);margin-top:2px">3-month SORA compounding · resets quarterly</div></div>
-            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px;font-weight:800;color:var(--blue2)">~1.50–1.65%</span><span style="font-size:10px;padding:2px 8px;background:rgba(74,159,212,0.12);border:1px solid rgba(74,159,212,0.3);border-radius:8px;color:var(--blue2)">Ask Kai Ling →</span></div>
-          </a><a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);text-decoration:none;transition:background .15s" onmouseover="this.style.background='var(--bg4)'" onmouseout="this.style.background=''">
-            <div><div style="font-size:13px;font-weight:600;color:var(--text)">FHR / Board Rate</div><div style="font-size:11.5px;color:var(--text3);margin-top:2px">Fixed Deposit Home Rate · bank-set reference</div></div>
-            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px;font-weight:800;color:var(--blue2)">~1.65–2.00%</span><span style="font-size:10px;padding:2px 8px;background:rgba(74,159,212,0.12);border:1px solid rgba(74,159,212,0.3);border-radius:8px;color:var(--blue2)">Ask Kai Ling →</span></div>
-          </a>
+      <div class="card-hdr"><span>&#128202;</span><span class="card-title">SORA Floating Packages</span><span class="tip-icon" data-tip="SORA ~1.20% as at Mar 2026. Resets monthly (1M) or quarterly (3M). Lower when rates fall, higher when they rise." style="margin-left:auto">?</span></div>
+      <div class="card-body" style="padding:0;overflow-x:auto">
+        <table class="rate-table" style="min-width:500px">
+          <thead><tr><th>Bank</th><th>Package</th><th>Current All-in</th><th>SORA Component</th><th>Spread</th><th>Lock-in</th><th></th></tr></thead>
+          <tbody><tr><td><strong>DBS</strong></td><td style="color:var(--text3);font-size:11.5px">1M SORA</td><td style="color:var(--blue2);font-weight:700">~1.45%</td><td style="color:var(--text3)">1M SORA ~1.20%</td><td style="color:var(--text2)">+0.25%</td><td style="color:var(--text3);font-size:11.5px">1 yr</td><td><a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="font-size:11px;padding:3px 8px;background:rgba(74,159,212,0.12);border:1px solid rgba(74,159,212,0.3);border-radius:8px;color:var(--blue2);text-decoration:none;white-space:nowrap">Enquire &#8594;</a></td></tr><tr><td><strong>OCBC</strong></td><td style="color:var(--text3);font-size:11.5px">1M SORA</td><td style="color:var(--blue2);font-weight:700">~1.42%</td><td style="color:var(--text3)">1M SORA</td><td style="color:var(--text2)">+0.22%</td><td style="color:var(--text3);font-size:11.5px">1 yr</td><td><a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="font-size:11px;padding:3px 8px;background:rgba(74,159,212,0.12);border:1px solid rgba(74,159,212,0.3);border-radius:8px;color:var(--blue2);text-decoration:none;white-space:nowrap">Enquire &#8594;</a></td></tr><tr><td><strong>UOB</strong></td><td style="color:var(--text3);font-size:11.5px">3M SORA</td><td style="color:var(--blue2);font-weight:700">~1.50%</td><td style="color:var(--text3)">3M SORA ~1.25%</td><td style="color:var(--text2)">+0.25%</td><td style="color:var(--text3);font-size:11.5px">1 yr</td><td><a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="font-size:11px;padding:3px 8px;background:rgba(74,159,212,0.12);border:1px solid rgba(74,159,212,0.3);border-radius:8px;color:var(--blue2);text-decoration:none;white-space:nowrap">Enquire &#8594;</a></td></tr><tr><td><strong>Standard Chartered</strong></td><td style="color:var(--text3);font-size:11.5px">SORA OHR</td><td style="color:var(--blue2);font-weight:700">~1.55%</td><td style="color:var(--text3)">1M SORA</td><td style="color:var(--text2)">+0.35%</td><td style="color:var(--text3);font-size:11.5px">None</td><td><a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="font-size:11px;padding:3px 8px;background:rgba(74,159,212,0.12);border:1px solid rgba(74,159,212,0.3);border-radius:8px;color:var(--blue2);text-decoration:none;white-space:nowrap">Enquire &#8594;</a></td></tr><tr><td><strong>Maybank</strong></td><td style="color:var(--text3);font-size:11.5px">1M SORA</td><td style="color:var(--blue2);font-weight:700">~1.48%</td><td style="color:var(--text3)">1M SORA</td><td style="color:var(--text2)">+0.28%</td><td style="color:var(--text3);font-size:11.5px">1 yr</td><td><a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="font-size:11px;padding:3px 8px;background:rgba(74,159,212,0.12);border:1px solid rgba(74,159,212,0.3);border-radius:8px;color:var(--blue2);text-decoration:none;white-space:nowrap">Enquire &#8594;</a></td></tr></tbody>
+        </table>
       </div>
     </div>
- 
-    <!-- HDB Loan -->
     <div class="card" style="margin-bottom:12px">
-      <div class="card-hdr"><span>🏠</span><span class="card-title">HDB Concessionary Loan</span></div>
+      <div class="card-hdr"><span>&#127968;</span><span class="card-title">HDB Concessionary Loan</span></div>
       <div class="card-body" style="padding:0">
         <a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;text-decoration:none;transition:background .15s" onmouseover="this.style.background='var(--bg4)'" onmouseout="this.style.background=''">
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text)">HDB Loan (for HDB flats only)</div>
-            <div style="font-size:11.5px;color:var(--text3);margin-top:3px;line-height:1.7">Fixed at CPF OA rate + 0.1% · Currently 2.60% p.a. · Max LTV 80% · Max tenure 25 years · Must have HFE Letter · No lock-in period</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:12px"><span style="font-size:18px;font-weight:800;color:var(--amber)">2.60%</span><span style="font-size:10px;padding:2px 8px;background:rgba(229,162,40,0.12);border:1px solid rgba(229,162,40,0.3);border-radius:8px;color:var(--amber)">Ask Kai Ling →</span></div>
+          <div><div style="font-size:13px;font-weight:600;color:var(--text)">HDB Concessionary Loan — HDB flats only</div><div style="font-size:11.5px;color:var(--text3);margin-top:3px">Fixed at CPF OA + 0.1% &middot; <strong style="color:var(--amber)">2.60% p.a.</strong> &middot; LTV 80% &middot; Max 25 yrs &middot; No lock-in &middot; HFE Letter required</div></div>
+          <span style="font-size:22px;font-weight:800;color:var(--amber);margin-left:16px;flex-shrink:0">2.60%</span>
         </a>
       </div>
     </div>
- 
-    <!-- Rate comparison guide -->
     <div class="card" style="margin-bottom:12px">
-      <div class="card-hdr"><span>⚖</span><span class="card-title">Fixed vs Floating — Quick Guide</span></div>
+      <div class="card-hdr"><span>&#9878;</span><span class="card-title">Fixed vs SORA — Quick Guide</span></div>
       <div class="card-body" style="font-size:12.5px;color:var(--text2);line-height:1.8">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div style="padding:10px;background:var(--bg4);border-radius:var(--radius3)">
-            <div style="font-weight:700;color:var(--teal);margin-bottom:6px">Fixed Rate</div>
-            <div>✓ Certainty — same payment every month</div>
-            <div>✓ Good when rates are rising</div>
-            <div>✗ Higher initial rate</div>
-            <div>✗ Penalty if you sell/refinance during lock-in</div>
-          </div>
-          <div style="padding:10px;background:var(--bg4);border-radius:var(--radius3)">
-            <div style="font-weight:700;color:var(--blue2);margin-bottom:6px">SORA Floating</div>
-            <div>✓ Lower rate when SORA is low</div>
-            <div>✓ No lock-in (some packages)</div>
-            <div>✗ Payment fluctuates with SORA</div>
-            <div>✗ Risk if SORA rises sharply</div>
-          </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div style="padding:10px;background:var(--bg4);border-radius:var(--radius3)"><div style="font-weight:700;color:var(--teal);margin-bottom:5px">Fixed Rate</div><div>&#10003; Same payment every month</div><div>&#10003; Good when rates are rising</div><div>&#10007; Higher initial rate</div><div>&#10007; Penalty to refinance in lock-in</div></div>
+          <div style="padding:10px;background:var(--bg4);border-radius:var(--radius3)"><div style="font-weight:700;color:var(--blue2);margin-bottom:5px">SORA Floating</div><div>&#10003; Lower when SORA is low</div><div>&#10003; Short or no lock-in</div><div>&#10007; Payment fluctuates</div><div>&#10007; Risk if SORA rises sharply</div></div>
         </div>
-        <div style="margin-top:10px;padding:10px 12px;background:rgba(200,169,110,0.08);border-radius:var(--radius3);border-left:3px solid var(--gold)">
-          <strong style="color:var(--gold)">Kai Ling's take:</strong> For most buyers in 2026, a 2-year fixed gives the best balance of certainty and cost. SORA has been falling — floating may benefit from further cuts, but fixed gives peace of mind. Always review at the end of your lock-in period.
-        </div>
+        <div style="padding:9px 12px;background:rgba(200,169,110,0.08);border-radius:var(--radius3);border-left:3px solid var(--gold)"><strong style="color:var(--gold)">Kai Ling (Mar 2026):</strong> With SORA trending down, 1M SORA gives good value. For certainty, a 2-year fixed is the sweet spot. Always review at lock-in expiry. <a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="color:var(--gold);font-weight:600;text-decoration:none">Ask me &#8594;</a></div>
       </div>
     </div>
- 
-    <!-- Refinancing reminder -->
     <div class="card">
-      <div class="card-hdr"><span>🔄</span><span class="card-title">Refinancing — When to Review</span></div>
+      <div class="card-hdr"><span>&#128260;</span><span class="card-title">Refinancing Checklist</span></div>
       <div class="card-body" style="font-size:12.5px;color:var(--text2);line-height:1.8">
-        <div>Review your mortgage <strong>3 months before your lock-in period ends</strong>. Switching to a lower rate on a $1M loan can save <strong>$300–600/month</strong>.</div>
-        <div style="margin-top:8px">Key checklist:</div>
-        <div style="margin-top:4px;display:flex;flex-direction:column;gap:3px">
-          <div>• Check your current lock-in expiry date</div>
-          <div>• Compare rates from at least 3 banks</div>
-          <div>• Factor in legal/valuation fees (~$2,000–3,500)</div>
-          <div>• Ensure remaining loan &gt; $200K (otherwise savings may not justify cost)</div>
-        </div>
-        <a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:10px 18px;background:#25D366;border-radius:var(--radius2);color:#fff;font-size:13px;font-weight:700;text-decoration:none">💬 Get a free rate comparison from Kai Ling</a>
+        Review <strong>3 months before lock-in ends</strong>. On $1M loan, saving 0.3% = ~$250/month.
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:3px"><div>&bull; Find lock-in expiry date (check letter of offer)</div><div>&bull; Compare at least 3 banks — rates differ by up to 0.4%</div><div>&bull; Budget legal + valuation fees ($2,000&ndash;3,500)</div><div>&bull; Remaining loan &gt;$200K to justify switching cost</div></div>
+        <a href="https://wa.me/6589089011?text=Hi Kai Ling, I saw the rates on SG Property Planner and would like to discuss my mortgage options." target="_blank" style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:9px 16px;background:#25D366;border-radius:var(--radius2);color:#fff;font-size:12.5px;font-weight:700;text-decoration:none">&#128172; Get free rate comparison from Kai Ling</a>
       </div>
     </div>
- 
   </div>
 </div>
  
@@ -1328,6 +1293,27 @@ function setPropType(type, el){
   if(ctEl) ctEl.classList.add('active');
  
   // Show/hide HDB-specific sections
+  const grantSec2=document.getElementById('hdb-grants-section');
+  if(grantSec2) grantSec2.style.display=type==='hdb'?'block':'none';
+  const levySec2=document.getElementById('hdb-levy-section');
+  if(levySec2) levySec2.style.display=type==='hdb'?'block':'none';
+  const holdCard=document.getElementById('holding-cost-card');
+  if(holdCard) holdCard.style.display=type==='resalecondo'?'block':'none';
+  // Show property lease field for private (not HDB which has its own section)
+  const propLeaseField=document.getElementById('prop-lease-field');
+  if(propLeaseField) propLeaseField.style.display=(type==='resalecondo'||type==='newlaunch'||type==='landed')?'block':'none';
+  // Update MCST label for HDB
+  const mcstLabel=document.getElementById('mcst-label');
+  const mcstInput=document.getElementById('mcst-fee');
+  if(type==='hdb'){
+    if(mcstLabel) mcstLabel.textContent='S&CC (Service & Conservancy Charges)';
+    if(mcstInput) mcstInput.value='70'; // mid-range HDB S&CC ~$22–$125/mo
+  } else {
+    if(mcstLabel) mcstLabel.textContent='MCST / Maintenance';
+    if(mcstInput && mcstInput.value==='70') mcstInput.value='350';
+  }
+  const mrCard=document.getElementById('monthly-ratio-card');
+  if(mrCard) mrCard.style.display=type==='newlaunch'?'none':'block';
 }
  
 // ── Toggle Buyer 2 ──
@@ -1354,8 +1340,37 @@ function onLoanSourceChange(){
 }
  
 function onAgeOrTenureChange(){
-  const t = document.getElementById('loanTenure').value;
+  const tenureEl = document.getElementById('loanTenure');
+  const ageEl = document.getElementById('b1-age');
+  const b1age = parseInt(ageEl?.value)||35;
+  const isHDB = propType==='hdb';
+  const loanSrc = document.getElementById('loanSource')?.value||'bank';
+ 
+  // MAS rule: age + loan tenure ≤ 65 for reduced LTV (bank loan)
+  // Also hard cap: private ≤ 35yr, HDB ≤ 25yr
+  const hardMax = isHDB ? 25 : 35;
+  const ageMax = Math.max(5, 65 - b1age); // at least 5 years
+  const effectiveMax = Math.min(hardMax, ageMax);
+ 
+  tenureEl.max = effectiveMax;
+  if(parseInt(tenureEl.value) > effectiveMax) tenureEl.value = effectiveMax;
+ 
+  const t = tenureEl.value;
   document.getElementById('tenure-display').textContent = t;
+ 
+  // Show tenure-ltv-note if age+tenure > 65 or tenure > 30
+  const noteEl = document.getElementById('tenure-ltv-note');
+  if(noteEl){
+    const agePenalty = (b1age + parseInt(t)) > 65;
+    const tenurePenalty = parseInt(t) > (isHDB ? 25 : 30);
+    noteEl.style.display = (agePenalty || tenurePenalty) ? 'block' : 'none';
+    if(agePenalty){
+      noteEl.textContent = `⚠ Age + tenure = ${b1age+parseInt(t)} > 65 — LTV reduced to 55%, min cash 10%`;
+    } else if(tenurePenalty){
+      noteEl.textContent = `⚠ Tenure >30yr — LTV reduced to 55%, min cash 10%`;
+    }
+  }
+ 
   calculate();
 }
  
@@ -1392,11 +1407,13 @@ function calculate(){
   const agePenalty = (b1age + tenure) > 65;
   const tenurePenaltyPrivate = tenure > 30;
   const tenurePenaltyHDB = tenure > 25;
-  const ltvReduced = loanSrc==='bank' && (agePenalty || tenurePenaltyPrivate);
+  // LTV reduced if: bank loan AND (age+tenure>65 OR tenure>30 for private OR tenure>25 for HDB)
+  const tenurePenalty = isHDB ? tenurePenaltyHDB : tenurePenaltyPrivate;
+  const ltvReduced = loanSrc==='bank' && (agePenalty || tenurePenalty);
  
   let ltvPct, minCashPct, minCPFCashPct;
   if(loanSrc==='hdb'){
-    ltvPct=.75; minCashPct=0; minCPFCashPct=.25;
+    ltvPct=.80; minCashPct=0; minCPFCashPct=.20; // HDB loan: 80% LTV (MAS 2022)
   } else if(loanSrc==='bank'){
     if(!ltvReduced){
       if(outstanding===0)     { ltvPct=.75; minCashPct=.05; minCPFCashPct=.25; }
@@ -1422,7 +1439,23 @@ function calculate(){
   let minCash = Math.round(baseVal*minCashPct) + cov;
   if(isHDB) minCash = Math.max(minCash, 5000+cov);
  
-  const cpfUsable = Math.max(0, totalDP - minCash);
+  // CPF 95-yr rule: if (youngest buyer age + remaining lease) < 95, CPF is pro-rated or 0
+  const propLease = parseInt(document.getElementById('prop-lease-tenure')?.value||999);
+  const youngestAge = Math.min(b1age, buyerCount===2?b2age:b1age);
+  const ageAtLeaseEnd = youngestAge + propLease;
+  let cpfUsable = Math.max(0, totalDP - minCash);
+  if(!isHDB && propLease < 999){
+    const leaseNoteEl = document.getElementById('prop-lease-note');
+    if(ageAtLeaseEnd < 95){
+      // Pro-rate CPF: fraction = (95 - youngestAge) / propLease  but capped at 1
+      const cpfFraction = Math.min(1, Math.max(0, (95 - youngestAge) / propLease));
+      const cpfCap = Math.round(baseVal * cpfFraction);
+      cpfUsable = Math.min(cpfUsable, cpfCap);
+      if(leaseNoteEl) { leaseNoteEl.style.display='block'; leaseNoteEl.textContent=`⚠ Youngest buyer age ${youngestAge} + lease ${propLease} = ${ageAtLeaseEnd} < 95 — CPF usage pro-rated to ~${(cpfFraction*100).toFixed(0)}% of purchase price`; }
+    } else {
+      if(leaseNoteEl) leaseNoteEl.style.display='none';
+    }
+  }
   const monthly = loanSrc!=='none' ? calcPMT(maxLoan,rate,tenure) : 0;
   const totalPaid = monthly*tenure*12;
   const totalInterest = totalPaid - maxLoan;
@@ -1473,6 +1506,9 @@ function calculate(){
   el('chip-interest').textContent  = loanSrc!=='none'?fmt2(Math.round(yr1Interest)):'—';
  
   // TDSR/MSR
+  // Hide TDSR for HDB — only MSR is relevant
+  const tdsrRowEl = document.getElementById('tdsr-row');
+  if(tdsrRowEl) tdsrRowEl.style.display = isHDB ? 'none' : 'flex';
   el('tdsr-val').textContent = tdsrPct.toFixed(1)+'%';
   el('tdsr-val').style.color = tdsrPct<=55?'var(--green)':'var(--red)';
   el('tdsr-bar').style.width = Math.min(tdsrPct,100)+'%';
@@ -1536,7 +1572,16 @@ function calculate(){
 function renderChart(){
   const r = _calc;
   if(!r.price) return;
-  const loan = r.maxLoan||0, cpf = Math.min(r.cpfUsable||0, r.totalDP||0), cash = Math.max(0,(r.totalDP||0)-cpf), sd = r.totalSD||0;
+  // Use slider-adjusted values if user has moved them
+  const cs2=document.getElementById('funds-cash-slider');
+  const ps2=document.getElementById('funds-cpf-slider');
+  const loan = r.maxLoan||0;
+  const minCash2 = r.minCash||0;
+  const maxCPF2 = r.cpfUsable||0;
+  const cash = cs2 ? Math.max(minCash2,parseInt(cs2.value)||minCash2) : minCash2;
+  const cpfMax2 = Math.min(maxCPF2,Math.max(0,(r.totalDP||0)-cash));
+  const cpf = ps2 ? Math.min(cpfMax2,Math.max(0,parseInt(ps2.value)||cpfMax2)) : cpfMax2;
+  const sd = r.totalSD||0;
   const data = [loan,cpf,cash,sd].map(Math.round);
   const labels = ['Bank Loan','CPF OA','Min Cash','Stamp Duty'];
   const colors = ['#63b5e8','#2ec4a9','#e05c5c','#e5a228'];
@@ -1722,7 +1767,9 @@ function renderFunds(){
       <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px"><span>Total</span><span style="color:${shortfall>0?'var(--red)':'var(--gold)'}">${fmt2(maxLoan+actualCPF+actualCash)}${shortfall>0?' -- short '+fmt2(shortfall):''}</span></div>
       <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:3px"><span>Price</span><span>${fmt2(r.price)}</span></div>
     </div>
-    <div style="margin-top:6px;font-size:10.5px;color:var(--text3)">MAS min cash: <strong style="color:var(--amber)">${fmt2(minCash)}</strong></div>
+    <div style="margin-top:8px;padding:7px 10px;background:rgba(229,162,40,0.08);border-left:2px solid var(--amber);border-radius:0 var(--radius3) var(--radius3) 0;font-size:11px;color:var(--text2);line-height:1.6">
+      <strong style="color:var(--amber)">Payment order (MAS):</strong> Cash first (min ${fmt2(minCash)}) → CPF OA → Bank Loan. CPF cannot substitute the mandatory cash component.
+    </div>
   `;
 }
 function onFundsSlide(){
@@ -1732,7 +1779,12 @@ function onFundsSlide(){
   const cash=Math.max(r.minCash||0,parseInt(cs.value)||0); cs.value=cash;
   const cpfMax=Math.min(r.cpfUsable||0,Math.max(0,(r.totalDP||0)-cash));
   ps.max=Math.max(1,cpfMax); ps.value=Math.min(cpfMax,Math.max(0,parseInt(ps.value)||0));
+  // Update _calc with user-overridden values so chart reflects slider
+  const actualCash=cash;
+  const actualCPF=Math.min(cpfMax,Math.max(0,parseInt(ps.value)||0));
+  _calc._fundsCash=actualCash; _calc._fundsCPF=actualCPF;
   renderFunds();
+  renderChart(); // update pie chart to reflect slider values
 }
  
 // ══════════════════════════════════════════
@@ -1817,12 +1869,14 @@ function triggerDangers(){
     addAlert('danger','Non-Citizens require LDAU approval for mainland landed property.','WhatsApp to assess',waBase+'Hi Kai Ling, I am a non-SC interested in landed property and need LDAU guidance.');
   }
  
-  // TDSR approaching limit
-  if(r.tdsrPct>50&&r.tdsrPct<=55){
-    addAlert('warn',`TDSR at ${r.tdsrPct?.toFixed(1)}% — nearing MAS 55% limit. Consider debt restructuring.`,'Get advice',waBase+'Hi Kai Ling, my TDSR is approaching the MAS limit and I need advice on debt restructuring.');
-  }
-  if(r.tdsrPct>55){
-    addAlert('danger',`TDSR at ${r.tdsrPct?.toFixed(1)}% — exceeds MAS 55% cap. Loan not approvable at this income/price.`,'Get advice',waBase+'Hi Kai Ling, my TDSR exceeds MAS limits and I need help restructuring.');
+  // TDSR alerts — not relevant for HDB (MSR is the correct metric)
+  if(propType!=='hdb'){
+    if(r.tdsrPct>50&&r.tdsrPct<=55){
+      addAlert('warn',`TDSR at ${r.tdsrPct?.toFixed(1)}% — nearing MAS 55% limit. Consider debt restructuring.`,'Get advice',waBase+'Hi Kai Ling, my TDSR is approaching the MAS limit and I need advice on debt restructuring.');
+    }
+    if(r.tdsrPct>55){
+      addAlert('danger',`TDSR at ${r.tdsrPct?.toFixed(1)}% — exceeds MAS 55% cap. Loan not approvable at this income/price.`,'Get advice',waBase+'Hi Kai Ling, my TDSR exceeds MAS limits and I need help restructuring.');
+    }
   }
  
   // MSR warning (HDB)
@@ -1892,13 +1946,19 @@ function calcGrants(){
     else if(income<=5000) ahg=5000;
   }
  
-  const total = ehg + phg + ahg;
+  const ehgOv=parseFloat((document.getElementById('grant-ehg-override')?.value||'').replace(/,/g,''))||null;
+  const phgOv=parseFloat((document.getElementById('grant-phg-override')?.value||'').replace(/,/g,''))||null;
+  const ahgOv=parseFloat((document.getElementById('grant-ahg-override')?.value||'').replace(/,/g,''))||null;
+  const ehgF=ehgOv!==null?ehgOv:ehg;
+  const phgF=phgOv!==null?phgOv:phg;
+  const ahgF=ahgOv!==null?ahgOv:ahg;
+  const total = ehgF + phgF + ahgF;
  
   body.innerHTML=`
     <div style="display:flex;flex-direction:column;gap:6px">
-      <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text3)">Enhanced Housing Grant (EHG)</span><span style="font-weight:600;color:var(--teal)">${fmt2(ehg)}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text3)">Proximity Housing Grant (PHG)</span><span style="font-weight:600;color:var(--blue2)">${fmt2(phg)}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text3)">Additional CPF Grant (AHG)</span><span style="font-weight:600;color:var(--amber)">${fmt2(ahg)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text3)">Enhanced Housing Grant (EHG)</span><span style="font-weight:600;color:var(--teal)">${fmt2(ehgF)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text3)">Proximity Housing Grant (PHG)</span><span style="font-weight:600;color:var(--blue2)">${fmt2(phgF)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text3)">Additional CPF Grant (AHG)</span><span style="font-weight:600;color:var(--amber)">${fmt2(ahgF)}</span></div>
       <hr class="sep" style="margin:4px 0">
       <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700"><span>Total Grants</span><span style="color:var(--gold)">${fmt2(total)}</span></div>
     </div>
@@ -2599,90 +2659,118 @@ function printSummary(){
   const r=_calc;
   if(!r.price){alert('Enter property details first.');return;}
   const f=n=>'$'+Math.round(n).toLocaleString('en-SG');
+  const fp=n=>'$'+Number(n).toLocaleString('en-SG',{minimumFractionDigits:0});
   const pn={newlaunch:'New Launch Condo',resalecondo:'Resale Condo',hdb:'Resale HDB',landed:'Landed'};
-  const w=window.open('','_blank','width=820,height=960');
+  const w=window.open('','_blank','width=900,height=1100');
   if(!w){alert('Allow popups to use Print.');return;}
-  w.document.write('<!DOCTYPE html><html><head><title>SG Property Summary</title>'
-    +'<style>body{font-family:Arial;font-size:13px;color:#111;padding:30px;max-width:700px;margin:0 auto}h1{font-size:20px;margin-bottom:4px}.sub{color:#666;font-size:12px;margin-bottom:16px}table{width:100%;border-collapse:collapse;margin-bottom:14px}th{background:#f0f0f0;padding:7px 10px;text-align:left;font-size:11px;text-transform:uppercase}td{padding:7px 10px;border-bottom:1px solid #eee}.v{text-align:right;font-weight:600}.r{color:#c0392b}.g{color:#27ae60}.d{color:#b7860c}.s{font-size:14px;font-weight:700;margin:14px 0 5px;border-bottom:2px solid #ddd;padding-bottom:3px}.ft{margin-top:20px;padding-top:8px;border-top:1px solid #ddd;font-size:11px;color:#888}@media print{button{display:none}}</style></head><body>'
-    +'<h1>SG Property Planner Summary</h1>'
-    +'<div class="sub">'+new Date().toLocaleDateString('en-SG',{day:'numeric',month:'long',year:'numeric'})+' - Koh Kai Ling - CEA R058161I - +65 8908 9011</div>'
-    +'<div class="s">Property</div><table><tbody>'
-    +'<tr><td>Type</td><td class="v">'+(pn[propType]||propType)+'</td></tr>'
-    +'<tr><td>Price</td><td class="v d">'+f(r.price)+'</td></tr>'
-    +'<tr><td>Valuation</td><td class="v">'+f(r.val||r.price)+'</td></tr>'
-    +(r.cov>0?'<tr><td>COV (cash only)</td><td class="v r">'+f(r.cov)+'</td></tr>':'')
-    +'</tbody></table>'
-    +'<div class="s">Loan</div><table><tbody>'
-    +'<tr><td>Max Loan ('+(r.ltvPct*100).toFixed(0)+'% LTV)</td><td class="v g">'+f(r.maxLoan)+'</td></tr>'
-    +'<tr><td>Min Cash Required</td><td class="v r">'+f(r.minCash)+'</td></tr>'
-    +'<tr><td>CPF OA Usable</td><td class="v">'+f(r.cpfUsable)+'</td></tr>'
-    +'<tr><td>Tenure / Rate</td><td class="v">'+r.tenure+'yr @ '+((r.rate||0)*100).toFixed(2)+'%</td></tr>'
-    +'</tbody></table>'
-    +'<div class="s">Monthly Repayment</div><table><tbody>'
-    +'<tr><td>Monthly Mortgage</td><td class="v d" style="font-size:16px">'+f(r.monthly)+'</td></tr>'
-    +'<tr><td>Total Interest</td><td class="v">'+f(r.totalInterest)+'</td></tr>'
-    +'<tr><td>TDSR</td><td class="v '+(r.tdsrPct>55?'r':'g')+'">'+r.tdsrPct.toFixed(1)+'%</td></tr>'
-    +(propType==='hdb'?'<tr><td>MSR</td><td class="v '+(r.msrPct>30?'r':'')+'">'+((r.msrPct||0).toFixed(1))+'%</td></tr>':'')
-    +'</tbody></table>'
-    +'<div class="s">Stamp Duties</div><table><tbody>'
-    +'<tr><td>BSD</td><td class="v">'+f(r.bsd)+'</td></tr>'
-    +'<tr><td>ABSD</td><td class="v r">'+f(r.absd)+'</td></tr>'
-    +'<tr><td>Total</td><td class="v r"><strong>'+f(r.totalSD)+'</strong></td></tr>'
-    +'</tbody></table>'
-    +'<div class="ft">Estimates for planning only. Not financial or legal advice. Verify with your bank and lawyer.<br><strong>Koh Kai Ling</strong> - CEA R058161I - FM Investment Global - +65 8908 9011</div>'
-    +'<br><button onclick="window.print()" style="padding:10px 24px;background:#111;color:#fff;border:none;border-radius:6px;cursor:pointer">Print / Save as PDF</button>'
-    +'</body></html>');
+  const now=new Date().toLocaleDateString('en-SG',{day:'numeric',month:'long',year:'numeric'});
+  const isHDB=propType==='hdb';
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SG Property Summary — ${pn[propType]||propType}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;color:#1a1a2e;background:#f8f9fc;padding:0}
+.page{max-width:780px;margin:0 auto;background:#fff;box-shadow:0 0 40px rgba(0,0,0,0.12)}
+.header{background:linear-gradient(135deg,#0b1118 0%,#172030 100%);color:#fff;padding:28px 36px 24px;position:relative}
+.header-logo{font-size:20px;font-weight:700;color:#c8a96e;letter-spacing:.3px;margin-bottom:3px}
+.header-sub{font-size:12px;color:#a0b4c8;margin-bottom:12px}
+.header-agent{display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.15)}
+.agent-av{width:38px;height:38px;border-radius:50%;background:#c8a96e;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0b1118;font-size:13px;flex-shrink:0}
+.agent-info{font-size:11px;color:#a0b4c8;line-height:1.6}
+.agent-name{font-size:13px;font-weight:600;color:#fff}
+.badge{display:inline-block;background:rgba(200,169,110,0.2);border:1px solid rgba(200,169,110,0.4);color:#c8a96e;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;float:right;margin-top:4px}
+.body{padding:28px 36px}
+.section{margin-bottom:22px}
+.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#5a7a96;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #e8eef4}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:8px}
+.stat-card{background:#f8f9fc;border-radius:8px;padding:12px 14px;border:1px solid #e8eef4}
+.stat-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#5a7a96;margin-bottom:4px}
+.stat-val{font-size:18px;font-weight:700;color:#1a1a2e}
+.stat-val.gold{color:#b7860c}
+.stat-val.teal{color:#1a9c87}
+.stat-val.red{color:#c0392b}
+.stat-sub{font-size:10px;color:#8090a8;margin-top:2px}
+.hero{background:linear-gradient(135deg,#172030,#1c2838);border-radius:10px;padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.hero-label{font-size:11px;color:#a0b4c8;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
+.hero-val{font-size:32px;font-weight:800;color:#c8a96e;letter-spacing:.5px}
+.hero-sub{font-size:11px;color:#a0b4c8;margin-top:4px}
+.hero-right{text-align:right}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{background:#f0f4f8;padding:8px 12px;text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:#5a7a96;border-bottom:2px solid #e8eef4}
+td{padding:8px 12px;border-bottom:1px solid #f0f4f8;color:#1a1a2e}
+tr:last-child td{border-bottom:none}
+.td-right{text-align:right;font-weight:600}
+.td-gold{text-align:right;font-weight:700;color:#b7860c}
+.td-teal{text-align:right;font-weight:600;color:#1a9c87}
+.td-red{text-align:right;font-weight:700;color:#c0392b}
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.pill-green{background:#e8f8f4;color:#1a9c87;border:1px solid #b0e8da}
+.pill-red{background:#fdf0ee;color:#c0392b;border:1px solid #f0c0b8}
+.pill-gold{background:#fdf6e8;color:#b7860c;border:1px solid #e8d898}
+.note-box{background:#fdf6e8;border:1px solid #e8d898;border-radius:8px;padding:12px 14px;margin-top:8px;font-size:11.5px;color:#6a5a2a;line-height:1.7}
+.footer{background:#f0f4f8;padding:16px 36px;font-size:10.5px;color:#5a7a96;line-height:1.7;border-top:2px solid #e8eef4}
+.wa-btn{display:inline-flex;align-items:center;gap:6px;background:#25D366;color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;border:none;cursor:pointer;margin-top:16px}
+@media print{body{background:#fff}.page{box-shadow:none}.wa-btn{display:none}button{display:none}}
+</style></head><body><div class="page">
+<div class="header">
+  <div class="header-logo">SG Property Planner</div>
+  <div class="header-sub">Property Planning Summary &mdash; Generated ${now}</div>
+  <span class="badge">${pn[propType]||propType}</span>
+  <div class="header-agent">
+    <div class="agent-av">KL</div>
+    <div><div class="agent-name">Koh Kai Ling</div><div class="agent-info">CEA R058161I &bull; FM Investment Global &bull; +65 8908 9011</div></div>
+  </div>
+</div>
+<div class="body">
+  <div class="hero">
+    <div><div class="hero-label">Purchase Price</div><div class="hero-val">${f(r.price)}</div><div class="hero-sub">Valuation: ${f(r.val||r.price)}${r.cov>0?' &bull; COV: <span style="color:#e8c990">'+f(r.cov)+'</span> (cash only)':''}</div></div>
+    <div class="hero-right"><div class="hero-label">Monthly Repayment</div><div class="hero-val">${f(r.monthly)}</div><div class="hero-sub">${r.tenure}yr &bull; ${((r.rate||0)*100).toFixed(2)}% p.a.</div></div>
+  </div>
+  <div class="section">
+    <div class="section-title">Loan &amp; Downpayment</div>
+    <div class="grid3">
+      <div class="stat-card"><div class="stat-label">Max Loan (${(r.ltvPct*100).toFixed(0)}% LTV)</div><div class="stat-val teal">${f(r.maxLoan)}</div></div>
+      <div class="stat-card"><div class="stat-label">Min Cash Required</div><div class="stat-val red">${f(r.minCash)}</div><div class="stat-sub">excl. stamp duties</div></div>
+      <div class="stat-card"><div class="stat-label">CPF OA Usable</div><div class="stat-val">${f(r.cpfUsable)}</div></div>
+    </div>
+    <div class="grid2">
+      <div class="stat-card"><div class="stat-label">Total Downpayment</div><div class="stat-val gold">${f(r.totalDP)}</div></div>
+      <div class="stat-card"><div class="stat-label">Tenure / Rate</div><div class="stat-val" style="font-size:15px">${r.tenure}yr @ ${((r.rate||0)*100).toFixed(2)}%</div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">Stamp Duties</div>
+    <table><thead><tr><th>Component</th><th style="text-align:right">Amount</th><th style="text-align:right">Notes</th></tr></thead><tbody>
+      <tr><td>Buyer Stamp Duty (BSD)</td><td class="td-gold">${f(r.bsd)}</td><td class="td-right" style="font-size:11px;color:#8090a8">Tiered 1–6%</td></tr>
+      <tr><td>Additional BSD (ABSD)</td><td class="td-red">${f(r.absd)}</td><td class="td-right" style="font-size:11px;color:#8090a8">${r.absdRate>0?(r.absdRate*100).toFixed(0)+'% applies':'0% (first property)'}</td></tr>
+      <tr style="background:#f8f9fc"><td><strong>Total Stamp Duty</strong></td><td class="td-red"><strong>${f(r.totalSD)}</strong></td><td class="td-right"><span class="pill ${r.absd>0?'pill-red':'pill-green'}">${r.absd>0?'ABSD applies':'No ABSD'}</span></td></tr>
+    </tbody></table>
+  </div>
+  <div class="section">
+    <div class="section-title">Debt Serviceability</div>
+    <div class="${isHDB?'grid2':'grid2'}">
+      ${isHDB?'':'<div class="stat-card"><div class="stat-label">TDSR</div><div class="stat-val '+( r.tdsrPct>55?'red':r.tdsrPct>50?'gold':'teal')+'">'+ r.tdsrPct.toFixed(1)+'%</div><div class="stat-sub">MAS cap: 55%</div></div>'}
+      <div class="stat-card"><div class="stat-label">${isHDB?'MSR':'MSR (if HDB)'}</div><div class="stat-val ${(r.msrPct||0)>30?'red':'teal'}">${(r.msrPct||0).toFixed(1)}%</div><div class="stat-sub">Cap: 30%</div></div>
+      <div class="stat-card"><div class="stat-label">Yr 1 Principal</div><div class="stat-val teal">${f(r.chipPrincipal||0)}</div></div>
+    </div>
+  </div>
+  <div class="note-box">
+    <strong>Payment order (MAS):</strong> Cash first (min ${f(r.minCash)}) &rarr; CPF OA &rarr; Bank Loan.<br>
+    BSD can be paid via CPF OA. ABSD must be paid in <strong>cash only</strong>.<br>
+    All figures are estimates for planning purposes. Verify with your bank and lawyer before transacting.
+  </div>
+  <div style="margin-top:16px;text-align:center">
+    <a class="wa-btn" href="https://wa.me/6589089011?text=Hi Kai Ling, I reviewed my property summary and would like a consultation." target="_blank">&#128172; WhatsApp Kai Ling for a Free Consultation</a>
+  </div>
+</div>
+<div class="footer">
+  <strong>Disclaimer:</strong> This summary is for planning purposes only and does not constitute financial, legal, or investment advice. Calculations are estimates based on MAS, HDB, CPF and IRAS regulations as at March 2026. Always verify with your bank, lawyer and relevant authority before transacting.<br>
+  <strong>Koh Kai Ling</strong> &bull; CEA R058161I &bull; FM Investment Global &bull; +65 8908 9011 &bull; <em>SG Property Planner v8.0</em>
+  <button onclick="window.print()" style="float:right;padding:8px 20px;background:#172030;color:#c8a96e;border:1px solid #c8a96e;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Print / Save as PDF</button>
+</div>
+</div></body></html>`);
   w.document.close();
 }
-// ══════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════
-window.addEventListener('load',()=>{
-  // Default date
-  const todayStr=new Date().toISOString().split('T')[0];
-  const tld=document.getElementById('tl-start-date');
-  if(tld) tld.value=todayStr;
- 
-  // MCST defaults based on prop type
-  document.getElementById('mcst-fee').value='350';
- 
-  // Comma format all inputs
-  initCommaInputs();
- 
-  // Disable HDB loan by default (new launch is default)
-  Array.from(document.getElementById('loanSource').options).forEach(o=>{ if(o.value==='hdb') o.disabled=true; });
- 
-  // Initial state
-  updateRatesGlance();
- 
-  // Run calculation
-  calculate();
-  renderTimeline();
-  calcRY();
-  calcSVB();
- 
-  // Pitfalls (simple static content)
-  renderPitfalls();
-});
- 
-function renderPitfalls(){
-  const body=document.getElementById('pitfalls-body');
-  if(!body) return;
-  const PITFALLS=[
-    {icon:'⏰',title:'Missing the OTP Deadline',desc:'The 4pm deadline on the last day of the option period is absolute. Missing it by 1 minute forfeits your option fee. Always exercise 1-2 days early.'},
-    {icon:'💰',title:'Underestimating Cash Required',desc:'Buyers often forget valuation fees, legal fees, agent commission, and stamp duties when calculating cash needed. Budget 2-3% above your minimum cash estimate.'},
-    {icon:'📋',title:'ABSD on Global Assets',desc:'ABSD is payable on overseas properties owned by buyers. Declare all overseas property holdings accurately — IRAS cross-checks with overseas tax authorities.'},
-    {icon:'🏗',title:'Unauthorised Renovations',desc:'For resale properties, check whether all A&A (additions and alterations) have URA Written Permission. Unauthorised works become your liability and may cause completion delays.'},
-    {icon:'⚠',title:'SSD Trap for Short Holds',desc:'Selling within 4 years of purchase incurs Seller Stamp Duty of 4-16%. This is frequently underestimated by investors. Calculate your exit cost before buying.'},
-    {icon:'📊',title:'TDSR on All Debts',desc:'TDSR includes ALL debt obligations: car loans, personal loans, student loans, renovation loans, and credit card minimums. Be comprehensive when calculating your debt servicing ratio.'},
-  ];
-  body.innerHTML=PITFALLS.map(p=>`
-    <div style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)">
-      <div style="font-size:18px;flex-shrink:0;margin-top:2px">${p.icon}</div>
-      <div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">${p.title}</div><div style="font-size:12px;color:var(--text2);line-height:1.65">${p.desc}</div></div>
-    </div>`).join('');
-}
- 
  
 // PAGE INIT
 document.addEventListener('DOMContentLoaded',function(){
@@ -2703,17 +2791,16 @@ document.addEventListener('DOMContentLoaded',function(){
   <div id="agent-fab-dot"></div>
 </div>
 <div id="agent-card-popup">
-  <button onclick="event.stopPropagation();document.getElementById('agent-card-popup').style.display='none'" style="position:absolute;top:8px;right:12px;background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:0">×</button>
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-    <div style="width:44px;height:44px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#0b1118;flex-shrink:0">KL</div>
+  <button onclick="event.stopPropagation();document.getElementById('agent-card-popup').style.display='none'" style="position:absolute;top:7px;right:10px;background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;line-height:1;padding:0">×</button>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+    <div style="width:36px;height:36px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#0b1118;flex-shrink:0">KL</div>
     <div>
-      <div style="font-size:14px;font-weight:700;color:var(--text)">Koh Kai Ling</div>
-      <div style="font-size:11.5px;color:var(--text3)">CEA: R058161I</div>
-      <div style="font-size:11.5px;color:var(--text3)">FM Investment Global</div>
+      <div style="font-size:12px;font-weight:700;color:var(--text)">Koh Kai Ling</div>
+      <div style="font-size:10px;color:var(--text3)">CEA: R058161I · FM Investment Global</div>
     </div>
   </div>
-  <div style="font-size:12px;color:var(--text2);font-style:italic;line-height:1.6;margin-bottom:12px;padding:8px 10px;background:var(--bg4);border-radius:var(--radius3);border-left:3px solid var(--gold)">"Your home journey, explained clearly — not just sold."</div>
-  <a href="https://wa.me/6589089011?text=Hi Kai Ling, I used the SG Property Planner and would like a consultation." target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:#25D366;border-radius:var(--radius2);color:#fff;font-size:13px;font-weight:700;text-decoration:none"><span>💬</span> Chat with Kai Ling</a>
+  <div style="font-size:10.5px;color:var(--text2);font-style:italic;line-height:1.5;margin-bottom:9px;padding:6px 8px;background:var(--bg4);border-radius:var(--radius3);border-left:2px solid var(--gold)">"Your home journey, explained clearly — not just sold."</div>
+  <a href="https://wa.me/6589089011?text=Hi Kai Ling, I used the SG Property Planner and would like a consultation." target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;background:#25D366;border-radius:var(--radius2);color:#fff;font-size:11.5px;font-weight:700;text-decoration:none"><span>💬</span> Chat with Kai Ling</a>
 </div>
  
 <!-- Mobile nav -->
@@ -2744,3 +2831,5 @@ document.addEventListener('DOMContentLoaded',function(){
   </div>
 </div>
 </body>
+</html>
+ 
