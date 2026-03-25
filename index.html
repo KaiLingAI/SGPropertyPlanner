@@ -42,10 +42,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-size:14px;line
 #feedback-topbar-btn{margin-left:auto;padding:5px 14px;background:var(--blue3);border:1px solid rgba(74,159,212,0.3);color:var(--blue2);border-radius:20px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0;white-space:nowrap}
  
 /* ── Layout ── */
-#shell{display:flex;height:100vh;padding-top:var(--topbar-h);overflow:hidden}
+#shell{display:flex;height:100vh;padding-top:var(--topbar-h);overflow:hidden;position:relative}
 #sidebar{
   width:var(--sidebar-w);flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
-  overflow-y:auto;display:flex;flex-direction:column;
+  overflow-y:auto;display:flex;flex-direction:column;height:100%;min-height:0;
 }
 #sidebar::-webkit-scrollbar{width:4px}
 #sidebar::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
@@ -56,7 +56,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-size:14px;line
 .snav-icon{font-size:14px;flex-shrink:0;width:18px;text-align:center}
 .snav-badge{font-size:9px;padding:1px 6px;border-radius:8px;background:rgba(78,175,125,0.15);color:var(--green);margin-left:auto;border:1px solid rgba(78,175,125,0.25)}
  
-#content{flex:1;overflow:hidden;display:flex;flex-direction:column}
+#content{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
  
 /* ── Panel system ── */
 .panel{display:none;flex:1;overflow:hidden;min-height:0}
@@ -75,7 +75,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-size:14px;line
 #calc-right::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
  
 /* ── Scrollable panels ── */
-.panel-scroll{flex:1;overflow-y:auto;padding:20px 22px}
+.panel-scroll{flex:1;overflow-y:auto;padding:20px 22px;min-height:0}
 .panel-scroll::-webkit-scrollbar{width:5px}
 .panel-scroll::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
  
@@ -994,7 +994,7 @@ function setPropType(type, el){
  
   // Valuation field label
   const valField = document.getElementById('valuation-field');
-  if(valField) valField.querySelector('.field-label').childNodes[0].textContent = isHDB ? 'HDB Valuation ' : 'Valuation / Market Value ';
+  if(valField){ const vlbl=valField.querySelector('.field-label'); if(vlbl&&vlbl.childNodes[0]) vlbl.childNodes[0].textContent = isHDB ? 'HDB Valuation ' : 'Valuation / Market Value '; }
  
   // Defaults on switch
   if(isHDB){
@@ -1026,16 +1026,13 @@ function toggleBuyer2(){
 // ── Loan Source Change ──
 function onLoanSourceChange(){
   const src = document.getElementById('loanSource').value;
-  const tenureEl = document.getElementById('loanTenure');
+  onAgeOrTenureChange();
   if(src==='hdb'){
-    tenureEl.max = 25;
-    if(parseInt(tenureEl.value)>25) tenureEl.value=25;
     document.getElementById('interestRate').value='2.60';
   } else if(src==='bank'){
-    tenureEl.max = 35;
     document.getElementById('interestRate').value='1.65';
   }
-  document.getElementById('tenure-display').textContent = tenureEl.value;
+  calculate();
 }
  
 let _tenureCapAge=65;
@@ -1069,7 +1066,7 @@ function calculate(){
   const incABSD = document.getElementById('toggle-absd').checked;
   const isHDB = propType==='hdb';
  
-  document.getElementById('tenure-display').textContent = tenure;
+  // tenure-display removed (now uses number input)
  
   const totalIncome = b1inc + b2inc;
   const totalDebtBase = b1dbt + b2dbt;
