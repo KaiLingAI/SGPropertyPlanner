@@ -42,7 +42,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-size:14px;line
 #feedback-topbar-btn{margin-left:auto;padding:5px 14px;background:var(--blue3);border:1px solid rgba(74,159,212,0.3);color:var(--blue2);border-radius:20px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0;white-space:nowrap}
  
 /* ── Layout ── */
-#shell{display:flex;height:100vh;padding-top:var(--topbar-h)}
+#shell{display:flex;height:100vh;padding-top:var(--topbar-h);overflow:hidden}
 #sidebar{
   width:var(--sidebar-w);flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
   overflow-y:auto;display:flex;flex-direction:column;
@@ -59,18 +59,18 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-size:14px;line
 #content{flex:1;overflow:hidden;display:flex;flex-direction:column}
  
 /* ── Panel system ── */
-.panel{display:none;flex:1;overflow:hidden}
-.panel.active{display:flex;flex-direction:column}
+.panel{display:none;flex:1;overflow:hidden;min-height:0}
+.panel.active{display:flex;flex-direction:column;min-height:0;overflow:hidden}
  
 /* ── Split-screen calc panel ── */
-#panel-calc{flex-direction:row!important}
+#panel-calc{flex-direction:row!important;min-height:0;overflow:hidden}
 #calc-left{
   width:420px;flex-shrink:0;overflow-y:auto;padding:20px 18px;
-  border-right:1px solid var(--border);
+  border-right:1px solid var(--border);min-height:0;
 }
 #calc-left::-webkit-scrollbar{width:4px}
 #calc-left::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
-#calc-right{flex:1;overflow-y:auto;padding:20px 18px;background:var(--bg2)}
+#calc-right{flex:1;overflow-y:auto;padding:20px 18px 60px;background:var(--bg2);min-height:0}
 #calc-right::-webkit-scrollbar{width:4px}
 #calc-right::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
  
@@ -1921,6 +1921,62 @@ function showPane(id){
   if(ps) ps.scrollTop=0;
 }
  
+ 
+// ══ MISSING UTILITY FUNCTIONS ══
+function clearAll(){
+  ['purchasePrice','valuation','b1-income','b1-debt','b2-income','b2-debt','cpf-oa-balance','cash-onhand','b2-cpf-oa-balance','b2-cash-onhand'].forEach(function(id){
+    var e=document.getElementById(id);if(!e)return;e.value='0';fmtInput(e);
+  });
+  ['b1-age','b2-age'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='35';});
+  var ir=document.getElementById('interestRate');if(ir)ir.value='1.65';
+  ['b1-residency','b2-residency','outstandingLoans','loanSource','b1-propcount','b2-propcount'].forEach(function(id){var e=document.getElementById(id);if(e)e.selectedIndex=0;});
+  var absdChk=document.getElementById('toggle-absd');if(absdChk)absdChk.checked=true;
+  _calc={};
+  var az=document.getElementById('alerts-zone');if(az)az.innerHTML='';
+  var fb=document.getElementById('funds-body');if(fb)fb.innerHTML='<p style="font-size:12px;color:var(--text3)">Enter details to see allocation.</p>';
+  document.querySelectorAll('.res-tile-val').forEach(function(t){t.textContent='—';});
+  var sb=document.getElementById('stage-body');if(sb)sb.innerHTML='<div style="font-size:12px;color:var(--text3)">Enter details to see the staged breakdown.</div>';
+  onAgeOrTenureChange();
+}
+function goBack(){
+  if(_paneHistory&&_paneHistory.length>0) showPane(_paneHistory.pop());
+  else showPane('calc');
+}
+var _paneHistory=[];
+function printSummary(){
+  var r=_calc;
+  if(!r||!r.price){alert('Please complete the calculator first.');return;}
+  var pn={newlaunch:'New Launch Condo',resalecondo:'Resale Condo',hdb:'Resale HDB',landed:'Landed Property'};
+  var w=window.open('','_blank');
+  if(!w){alert('Please allow popups to print.');return;}
+  w.document.write('<html><head><title>SG Property Summary</title><style>body{font-family:Arial,sans-serif;margin:30px;color:#222;max-width:800px}h1{color:#c8a96e;border-bottom:2px solid #c8a96e;padding-bottom:8px}.row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #eee}.label{color:#555;font-size:13px}.val{font-weight:700;font-size:13px}.sect{margin:18px 0 8px;font-weight:700;font-size:15px;color:#c8a96e}.cta{background:#25D366;color:white;padding:14px;border-radius:8px;text-align:center;margin:20px 0}.cta a{color:white;text-decoration:none;font-weight:700}@media print{button{display:none}}</style></head><body>');
+  w.document.write('<h1>&#127968; SG Property Planner — Summary</h1>');
+  w.document.write('<p style="color:#888;font-size:12px">'+new Date().toLocaleDateString('en-SG',{day:'numeric',month:'long',year:'numeric'})+' | Koh Kai Ling · CEA R058161I · FM Investment Global</p>');
+  w.document.write('<div class="sect">Property</div>');
+  w.document.write('<div class="row"><span class="label">Type</span><span class="val">'+(pn[propType]||propType)+'</span></div>');
+  w.document.write('<div class="row"><span class="label">Price</span><span class="val">'+fmt2(r.price)+'</span></div>');
+  w.document.write('<div class="sect">Financing</div>');
+  w.document.write('<div class="row"><span class="label">Max Loan ('+((r.ltvPct||0)*100).toFixed(0)+'% LTV)</span><span class="val">'+fmt2(r.maxLoan)+'</span></div>');
+  w.document.write('<div class="row"><span class="label">Min Cash</span><span class="val">'+fmt2(r.minCash)+'</span></div>');
+  w.document.write('<div class="row"><span class="label">CPF Usable</span><span class="val">'+fmt2(r.cpfUsable)+'</span></div>');
+  w.document.write('<div class="row"><span class="label">Monthly Repayment</span><span class="val">'+fmt2(r.monthly)+'/mo</span></div>');
+  w.document.write('<div class="sect">Stamp Duties</div>');
+  w.document.write('<div class="row"><span class="label">BSD</span><span class="val">'+fmt2(r.bsd)+'</span></div>');
+  if(r.absd>0)w.document.write('<div class="row"><span class="label">ABSD ('+((r.absdRate||0)*100).toFixed(0)+'%)</span><span class="val" style="color:#e05c5c">'+fmt2(r.absd)+'</span></div>');
+  w.document.write('<div class="row"><span class="label"><strong>Total Stamp Duty</strong></span><span class="val" style="color:#c8a96e"><strong>'+fmt2((r.bsd||0)+(r.absd||0))+'</strong></span></div>');
+  w.document.write('<div class="cta"><a href="https://wa.me/6589089011">&#128172; WhatsApp Kai Ling for a Free Personalised Consultation</a></div>');
+  w.document.write('<p style="font-size:11px;color:#aaa;margin-top:20px">For reference only. Verify with a licensed professional. Koh Kai Ling CEA R058161I.</p>');
+  w.document.write('</body></html>');w.document.close();setTimeout(function(){w.print();},500);
+}
+function updateResaleLevy(){
+  var base=parseFloat(document.getElementById('levy-flat-type')?.value||0);
+  var mult=parseFloat(document.getElementById('levy-singles-grant')?.value||1);
+  var levy=Math.round(base*mult);
+  var res=document.getElementById('levy-result'),amt=document.getElementById('levy-amount');
+  if(res)res.style.display=levy>0?'block':'none';
+  if(amt)amt.textContent=fmt2(levy);
+}
+ 
 // ══════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════
@@ -1931,7 +1987,7 @@ window.addEventListener('load',()=>{
   if(tld) tld.value=todayStr;
  
   // MCST defaults based on prop type
-  document.getElementById('mcst-fee').value='350';
+  var mcstEl=document.getElementById('mcst-fee');if(mcstEl)mcstEl.value='350';
  
   // Comma format all inputs
   initCommaInputs();
