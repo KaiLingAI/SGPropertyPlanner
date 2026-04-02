@@ -8,11 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-/* ═══════════════════════════════════════════════════
-   DESIGN SYSTEM — Dark luxury, Singapore gold
-═══════════════════════════════════════════════════ */
+/* ═══ DESIGN TOKENS ═══ */
 :root{
-  --bg:#0b1118;--bg2:#111b27;--bg3:#172030;--bg4:#1c2838;--card:#141e2a;
+  --bg:#0b1118;--bg2:#111b27;--bg3:#172030;--bg4:#1c2838;
   --border:rgba(99,165,210,0.13);--border2:rgba(99,165,210,0.25);--border3:rgba(99,165,210,0.4);
   --gold:#c8a96e;--gold2:#e8c990;--gold3:rgba(200,169,110,0.12);
   --blue:#4a9fd4;--blue2:#63b5e8;--blue3:rgba(74,159,212,0.12);
@@ -21,35 +19,48 @@
   --text:#e8eef4;--text2:#a0b4c8;--text3:#5a7a96;--text4:#3a5a74;
   --font:'Lexend',sans-serif;
   --radius:12px;--radius2:8px;--radius3:6px;
-  --shadow:0 4px 24px rgba(0,0,0,0.4);--shadow2:0 2px 12px rgba(0,0,0,0.3);
+  --shadow:0 4px 24px rgba(0,0,0,0.4);
   --topbar-h:56px;--sidebar-w:220px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;font-family:var(--font)}
-html{background:var(--bg)}body{background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
  
-/* ── Topbar ── */
+/* ═══ TOPBAR ═══ */
 #topbar{
-  position:fixed;top:0;left:0;right:0;height:var(--topbar-h);z-index:300;
+  position:fixed;top:0;left:0;right:0;height:56px;z-index:300;
   background:var(--bg2);border-bottom:1px solid var(--border);
   display:flex;align-items:center;padding:0 16px;gap:12px;
 }
 .logo{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--gold);white-space:nowrap}
-.logo span{font-family:var(--font);font-size:11px;font-weight:400;color:var(--text3);margin-left:8px}
-.topbar-tabs{display:flex;gap:2px;margin-left:16px;flex-shrink:1;overflow-x:auto;scrollbar-width:none}
+.logo span{font-family:var(--font);font-size:11px;color:var(--text3);margin-left:8px}
+.topbar-tabs{display:flex;gap:2px;margin-left:12px;flex-shrink:1;overflow-x:auto;scrollbar-width:none}
+.topbar-tabs::-webkit-scrollbar{display:none}
 .ttab{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;color:var(--text3);cursor:pointer;border:1px solid transparent;transition:all .2s;white-space:nowrap}
-.ttprop{padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;color:var(--text3);cursor:pointer;border:1px solid var(--border);transition:all .15s;white-space:nowrap;background:var(--bg3)}
-.ttprop:hover{color:var(--text2);border-color:var(--border2)}
-.ttprop.active{color:var(--gold);border-color:rgba(200,169,110,0.4);background:var(--gold3)}
 .ttab:hover{color:var(--text2);background:var(--bg3)}
 .ttab.active{color:var(--gold);background:var(--gold3);border-color:rgba(200,169,110,0.3)}
+.ttprop{padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;color:var(--text3);cursor:pointer;border:1px solid var(--border);transition:all .15s;white-space:nowrap;background:var(--bg3)}
+.ttprop:hover{color:var(--text2)}
+.ttprop.active{color:var(--gold);border-color:rgba(200,169,110,0.4);background:var(--gold3)}
 #feedback-topbar-btn{margin-left:auto;padding:5px 14px;background:var(--blue3);border:1px solid rgba(74,159,212,0.3);color:var(--blue2);border-radius:20px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0;white-space:nowrap}
  
-/* ── Layout ── */
-#shell{display:flex;height:100vh;padding-top:var(--topbar-h);overflow:hidden}
+/* ═══ BOTTOM DOCK ═══ */
+#bottom-dock{
+  position:fixed;bottom:0;left:0;right:0;height:48px;z-index:300;
+  background:var(--bg2);border-top:1px solid var(--border);
+  display:flex;align-items:center;padding:0 8px;gap:2px;overflow-x:auto;scrollbar-width:none;
+}
+.bd-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 8px;border-radius:8px;cursor:pointer;color:var(--text3);font-size:16px;gap:1px;white-space:nowrap;flex:1;max-width:72px;transition:all .15s}
+.bd-tab span{font-size:9px;font-weight:500}
+.bd-tab:hover{color:var(--text2);background:var(--bg3)}
+.bd-tab.active{color:var(--gold);background:var(--gold3)}
+ 
+/* ═══ MAIN SHELL ═══ */
+/* Simple: sidebar on left, content on right, both fill the gap between bars */
+#shell{display:flex;margin-top:56px;height:calc(100vh - 56px - 48px)}
 #sidebar{
-  width:var(--sidebar-w);flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--bg2);border-right:1px solid var(--border);
   overflow-y:auto;display:flex;flex-direction:column;
-  position:sticky;top:var(--topbar-h);height:calc(100vh - var(--topbar-h));
 }
 #sidebar::-webkit-scrollbar{width:4px}
 #sidebar::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
@@ -60,45 +71,91 @@ html{background:var(--bg)}body{background:var(--bg);color:var(--text);font-size:
 .snav-icon{font-size:14px;flex-shrink:0;width:18px;text-align:center}
 .snav-badge{font-size:9px;padding:1px 6px;border-radius:8px;background:rgba(78,175,125,0.15);color:var(--green);margin-left:auto;border:1px solid rgba(78,175,125,0.25)}
  
-#content{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+/* ═══ CONTENT + PANELS ═══ */
+#content{flex:1;overflow:hidden;position:relative}
  
-/* ── Panel system ── */
-.panel{display:none;flex:1}
-.panel.active{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
+/* All panels hidden by default */
+.panel{display:none}
  
-/* ── Split-screen calc panel ── */
-#panel-calc{flex-direction:column!important}
-#prop-type-strip{
-  flex-shrink:0;
-  background:var(--bg2);border-bottom:1px solid var(--border);
-  padding:10px 18px 10px;
+/* Active panel fills content and scrolls */
+.panel.active{
+  display:block;
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
 }
-#prop-type-strip #prop-type-bar{margin-bottom:0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:6px}
-#prop-type-strip #prop-type-bar::-webkit-scrollbar{display:none}
-@media(min-width:901px){#calc-split{flex-direction:row;flex:1;overflow:hidden}}
-#panel-calc > #calc-split{flex:1}
-#calc-left{
-  width:420px;flex-shrink:0;display:flex;flex-direction:column;
-  border-right:1px solid var(--border);overflow:hidden;
-}
-#calc-left-scroll{
-  flex:1;overflow-y:auto;padding:16px 18px 60px;
-}
-#calc-left-scroll::-webkit-scrollbar{width:4px}
-#calc-left-scroll::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
-#calc-right{flex:1;overflow-y:auto;padding:20px 18px;background:var(--bg2)}
-#calc-right::-webkit-scrollbar{width:4px}
-#calc-right::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
  
-/* ── Scrollable panels ── */
-.panel-scroll{flex:1;overflow-y:auto;padding:20px 22px;min-height:0}
+/* Padding wrapper inside scrolling panels */
+.panel-scroll{padding:20px 22px 80px}
 .panel-scroll::-webkit-scrollbar{width:5px}
 .panel-scroll::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
  
-/* ── Section headers ── */
-.section-hdr{margin-bottom:18px}
-.section-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:var(--text);margin-bottom:4px}
-.section-sub{font-size:12px;color:var(--text3)}
+/* ═══ CALCULATOR PANEL (split layout) ═══ */
+/* Override: calc panel uses flex column instead of block */
+#panel-calc.active{
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;  /* children handle their own scroll */
+}
+ 
+/* Sticky prop type strip at top of calc */
+#prop-type-strip{
+  flex-shrink:0;
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  padding:10px 18px;
+}
+#prop-type-strip #prop-type-bar{margin-bottom:0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:6px}
+#prop-type-strip #prop-type-bar::-webkit-scrollbar{display:none}
+ 
+/* Split: left inputs | right results */
+#calc-split{
+  flex:1;
+  display:flex;
+  flex-direction:row;
+  overflow:hidden;
+}
+ 
+/* LEFT pane */
+#calc-left{
+  width:420px;flex-shrink:0;
+  display:flex;flex-direction:column;
+  border-right:1px solid var(--border);
+  overflow:hidden;
+}
+#calc-left-scroll{
+  flex:1;overflow-y:auto;
+  padding:16px 18px 80px;
+  -webkit-overflow-scrolling:touch;
+}
+#calc-left-scroll::-webkit-scrollbar{width:4px}
+#calc-left-scroll::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+ 
+/* RIGHT pane */
+#calc-right{
+  flex:1;overflow-y:auto;
+  padding:20px 18px 80px;
+  background:var(--bg2);
+  -webkit-overflow-scrolling:touch;
+}
+#calc-right::-webkit-scrollbar{width:4px}
+#calc-right::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+ 
+/* ═══ MOBILE ═══ */
+@media(max-width:900px){
+  #sidebar{display:none}
+  #calc-split{flex-direction:column}
+  #calc-left{width:100%;flex:1;border-right:none;border-bottom:1px solid var(--border)}
+  #calc-right{flex:1}
+  .panel-scroll{padding:14px 14px 80px}
+  .logo span{display:none}
+  #topbar-prop-tabs{display:none}
+}
+@media(max-width:600px){
+  #topbar{padding:0 8px}
+  .ttab{padding:4px 8px;font-size:11px}
+  #feedback-topbar-btn .fb-label{display:none}
+}
  
 /* ── Property type tabs ── */
 #prop-type-bar{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
@@ -243,27 +300,24 @@ html{background:var(--bg)}body{background:var(--bg);color:var(--text);font-size:
 .key-rules-links{display:flex;gap:6px}
  
 /* ── Mobile ── */
-@media(max-width:900px){
-  #sidebar{display:none}
-  #calc-split{flex-direction:column!important}
-  #calc-left{width:100%;border-right:none;border-bottom:1px solid var(--border)}
-  #calc-right{width:100%}
+ 
+  
+  
+  
   .topbar-tabs{display:flex;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;flex-shrink:1;min-width:0}
   .topbar-tabs::-webkit-scrollbar{display:none}
   .logo span{display:none}
   #feedback-topbar-btn .fb-label{display:none}
   #topbar-prop-tabs .ttprop span{display:none}
 }
-@media(max-width:600px){
-  #topbar{padding:0 8px}
-  .logo span{display:none}
+ 
   .topbar-tabs{gap:0}
   .ttab{padding:4px 8px;font-size:11px}
   
   .res-grid{grid-template-columns:1fr 1fr}
   #feedback-topbar-btn .fb-label{display:none}
   #topbar-prop-tabs{display:none!important}
-  .panel-scroll{padding:14px}
+  
 }
  
 /* ── Misc ── */
@@ -280,6 +334,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .fadein{animation:fadein .3s ease}
 hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
+ 
+ 
+  
+  
+  
+  
+  .logo span{display:none}
+  #topbar-prop-tabs .ttprop{font-size:10px;padding:3px 6px}
+}
+ 
+  #topbar-prop-tabs{display:none}
+  #feedback-topbar-btn .fb-label{display:none}
+}
 </style>
 </head>
 <body>
@@ -347,19 +414,19 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 ══════════════════════════════════════════ -->
 <div class="panel active" id="panel-calc">
  
+  <!-- Prop type strip: always visible at top of calculator -->
+  <div id="prop-type-strip">
+    <div id="prop-type-bar">
+      <div class="ptab active" id="pt-newlaunch" onclick="setPropType('newlaunch',this)">New Launch</div>
+      <div class="ptab" id="pt-resalecondo" onclick="setPropType('resalecondo',this)">Resale Condo</div>
+      <div class="ptab" id="pt-hdb" onclick="setPropType('hdb',this)">Resale HDB</div>
+      <div class="ptab" id="pt-landed" onclick="setPropType('landed',this)">Landed</div>
+    </div>
+  </div>
+ 
   <div id="calc-split">
   <!-- LEFT: Inputs -->
   <div id="calc-left">
-    <!-- PROP TYPE BAR — fixed header, never scrolls away -->
-    <div id="prop-type-strip">
-      <div id="prop-type-bar">
-        <div class="ptab active" id="pt-newlaunch" onclick="setPropType('newlaunch',this)">New Launch</div>
-        <div class="ptab" id="pt-resalecondo" onclick="setPropType('resalecondo',this)">Resale Condo</div>
-        <div class="ptab" id="pt-hdb" onclick="setPropType('hdb',this)">Resale HDB</div>
-        <div class="ptab" id="pt-landed" onclick="setPropType('landed',this)">Landed</div>
-      </div>
-    </div>
-    <!-- SCROLLABLE INPUTS -->
     <div id="calc-left-scroll">
  
     <!-- Key rules glance (dynamic) -->
@@ -2768,11 +2835,11 @@ window.addEventListener('load',function(){
 .bd-tab:hover{color:var(--text2);background:var(--bg3)}
 .bd-tab.active{color:var(--gold);background:var(--gold3)}
 /* Add bottom padding to all panel-scroll so content isn't hidden behind dock */
-.panel-scroll{padding-bottom:60px!important}
-#calc-left-scroll{padding-bottom:60px!important}
-#calc-right{padding-bottom:60px!important}
+ 
+ 
+ 
 /* Agent bubble raised above dock */
-#agent-bubble{bottom:60px!important}
+#agent-bubble{bottom:58px!important}
 </style>
 </body>
 </html>
