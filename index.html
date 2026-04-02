@@ -20,14 +20,13 @@
   --font:'Lexend',sans-serif;
   --radius:12px;--radius2:8px;--radius3:6px;
   --shadow:0 4px 24px rgba(0,0,0,0.4);
-  --topbar-h:56px;--sidebar-w:220px;
+  --topbar-h:56px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;font-family:var(--font)}
-html{background:var(--bg)}
-body{background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;padding-top:var(--topbar-h);padding-bottom:56px}
+html,body{background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
  
 /* ── Topbar ── */
-#topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-h);z-index:300;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px}
+#topbar{position:fixed;top:0;left:0;right:0;height:56px;z-index:300;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px}
 .logo{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--gold);white-space:nowrap}
 .logo span{font-family:var(--font);font-size:11px;color:var(--text3);margin-left:8px}
 .topbar-tabs{display:flex;gap:2px;margin-left:12px;flex-shrink:1;overflow-x:auto;scrollbar-width:none}
@@ -41,56 +40,49 @@ body{background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;paddi
 #feedback-topbar-btn{margin-left:auto;padding:5px 14px;background:var(--blue3);border:1px solid rgba(74,159,212,0.3);color:var(--blue2);border-radius:20px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0;white-space:nowrap}
  
 /* ── Bottom dock ── */
-#bottom-dock{position:fixed;bottom:0;left:0;right:0;height:48px;z-index:300;background:var(--bg2);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 8px;gap:2px;overflow-x:auto;scrollbar-width:none}
-.bd-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 6px;border-radius:8px;cursor:pointer;color:var(--text3);font-size:16px;gap:1px;white-space:nowrap;flex:1;max-width:72px;transition:all .15s}
-.bd-tab span{font-size:9px;font-weight:500}
+#bottom-dock{position:fixed;bottom:0;left:0;right:0;height:48px;z-index:300;background:var(--bg2);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 4px;gap:0;overflow-x:auto;scrollbar-width:none}
+.bd-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 4px;border-radius:6px;cursor:pointer;color:var(--text3);font-size:15px;gap:1px;white-space:nowrap;flex:1;transition:all .15s}
+.bd-tab span{font-size:8px;font-weight:500}
 .bd-tab:hover{color:var(--text2);background:var(--bg3)}
 .bd-tab.active{color:var(--gold);background:var(--gold3)}
  
-/* ── Shell / layout ── */
-/* NO flex magic. Just a normal page that scrolls. */
+/* ═══════════════════════════════════
+   CORE LAYOUT — simple and reliable
+   All panels are hidden; only .active shows.
+   The page itself scrolls (not inner divs).
+═══════════════════════════════════ */
 #shell{display:block}
-#sidebar{display:none} /* sidebar hidden — navigation via topbar/dock */
+#sidebar{display:none}
 #content{display:block}
  
-/* ── Panels: show/hide only ── */
-.panel{display:none}
-.panel.active{display:block}
-.panel-scroll{padding:16px 16px 24px}
+/* Hide all panels */
+.panel{display:none !important}
  
-/* ── CALCULATOR: prop-type strip + content ── */
-#prop-type-strip{
-  position:sticky;
-  top:var(--topbar-h);
-  z-index:200;
-  background:var(--bg2);
-  border-bottom:1px solid var(--border);
-  padding:10px 16px;
-}
-#prop-type-strip #prop-type-bar{margin-bottom:0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:6px;display:flex}
-#prop-type-strip #prop-type-bar::-webkit-scrollbar{display:none}
+/* Show active panel — it occupies full page height */
+.panel.active{display:block !important;min-height:calc(100vh - 56px - 48px);padding-top:56px;padding-bottom:56px;background:var(--bg);color:var(--text)}
+@media(min-width:768px){.panel.active{height:calc(100vh - 56px - 48px);min-height:0;overflow:hidden}}
  
-/* calc-split: single column by default, side-by-side on landscape */
-#calc-split{display:block}
-#calc-left{padding:16px}
-#calc-right{padding:16px;background:var(--bg2)}
+/* Inner scroll wrapper just adds padding */
+.panel-scroll{padding:16px 16px 24px;max-width:900px;margin:0 auto}
  
-/* Landscape: side by side */
-@media(orientation:landscape) and (min-width:800px){
-  #calc-split{display:flex;flex-direction:row}
-  #calc-left{width:420px;flex-shrink:0;border-right:1px solid var(--border)}
-  #calc-right{flex:1}
-  #calc-left-scroll{padding:0}
-}
+/* ── Calculator panel ── */
+ /* strip handles top spacing */
  
-/* ── Misc ── */
-@media(max-width:600px){
-  #topbar{padding:0 10px}
-  .logo span{display:none}
-  .ttab{padding:4px 8px;font-size:11px}
-  #topbar-prop-tabs{display:none}
-  #feedback-topbar-btn .fb-label{display:none}
-}
+/* Prop-type strip: sticky below topbar */
+#prop-type-bar{display:flex;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:6px;margin-bottom:0}
+#prop-type-bar::-webkit-scrollbar{display:none}
+ 
+/* calc content: portrait = single column, landscape = side by side */
+ 
+/* LANDSCAPE: side by side */
+@media(min-width:768px) and (orientation:landscape){
+      }
+ 
+/* WIDE PORTRAIT / TABLET: also side by side */
+@media(min-width:900px) and (orientation:portrait){
+      }
+ 
+/* Mobile */
  
 /* ── Property type tabs ── */
 #prop-type-bar{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
@@ -281,6 +273,82 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
  
   #topbar-prop-tabs{display:none}
   #feedback-topbar-btn .fb-label{display:none}
+}
+ 
+/* ═══ CALCULATOR PANEL ═══ */
+#panel-calc.active{
+  display:block !important;
+  padding-top:0;
+  background:var(--bg);
+}
+ 
+/* Prop-type strip: sticky below topbar */
+#prop-type-strip{
+  position:sticky;
+  top:56px;
+  z-index:200;
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  padding:10px 16px;
+}
+#prop-type-bar{
+  display:flex;
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  scrollbar-width:none;
+  gap:6px;
+  margin-bottom:0;
+}
+#prop-type-bar::-webkit-scrollbar{display:none}
+ 
+/* Default (mobile/portrait): single column */
+#calc-split{display:block}
+#calc-left{padding:16px 16px 24px}
+#calc-left-scroll{display:block}
+#calc-right{
+  padding:16px 16px 24px;
+  background:var(--bg2);
+  border-top:2px solid var(--border);
+}
+ 
+/* Wide screens (>768px): side by side */
+@media(min-width:768px){
+  #panel-calc.active{display:flex !important;flex-direction:column}
+  #calc-split{
+    display:flex !important;
+    flex-direction:row;
+    flex:1;
+    overflow:hidden;
+    min-height:0;
+  }
+  #calc-left{
+    width:420px;
+    flex-shrink:0;
+    overflow-y:auto;
+    padding:20px 18px 60px;
+    border-right:1px solid var(--border);
+    border-top:none;
+    height:100%;
+  }
+  #calc-left-scroll{display:block}
+  #calc-right{
+    flex:1;
+    overflow-y:auto;
+    padding:20px 18px 60px;
+    background:var(--bg2);
+    border-top:none;
+    height:100%;
+  }
+}
+ 
+/* Mobile overrides */
+@media(max-width:600px){
+  #topbar{padding:0 8px}
+  .logo span{display:none}
+  .ttab{padding:4px 6px;font-size:10px}
+  #topbar-prop-tabs{display:none}
+  #feedback-topbar-btn .fb-label{display:none}
+  .panel-scroll{padding:12px 12px 60px}
 }
 </style>
 </head>
@@ -2330,9 +2398,21 @@ function loadFeedback(){
 // PANE NAVIGATION
 // ══════════════════════════════════════════
 function showPane(id){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  const panel=document.getElementById('panel-'+id);
-  if(panel) panel.classList.add('active');
+  // Hide all panels explicitly
+  document.querySelectorAll('.panel').forEach(function(p){
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
+  // Show target panel
+  const panel = document.getElementById('panel-' + id);
+  if(panel){
+    panel.classList.add('active');
+    if(id === 'calc' && window.innerWidth >= 768){
+      panel.style.display = 'flex';
+    } else {
+      panel.style.display = 'block';
+    }
+  }
   document.querySelectorAll('.snav').forEach(n=>n.classList.remove('active'));
   const snav=document.getElementById('snav-'+id);
   if(snav) snav.classList.add('active');
@@ -2347,9 +2427,8 @@ function showPane(id){
   if(id==='rates')    calcRates();
   if(id==='policy')   renderPolicy();
  
-  // Scroll to top
-  const ps=panel?.querySelector('.panel-scroll');
-  if(ps) ps.scrollTop=0;
+  // Scroll to top of page when switching panels
+  window.scrollTo(0,0);
   // Update bottom dock
   document.querySelectorAll('.bd-tab').forEach(t=>t.classList.remove('active'));
   const bd=document.getElementById('bd-'+id);
@@ -2567,6 +2646,12 @@ function onFundsSlide(){
   renderFunds();
 }
 window.addEventListener('load',()=>{
+  // Ensure initial panel state is correct
+  document.querySelectorAll('.panel').forEach(function(p){
+    p.style.display = 'none';
+  });
+  const calcPanel = document.getElementById('panel-calc');
+  if(calcPanel){ calcPanel.style.display = window.innerWidth >= 768 ? 'flex' : 'block'; }
   // Default date
   const todayStr=new Date().toISOString().split('T')[0];
   const tld=document.getElementById('tl-start-date');
