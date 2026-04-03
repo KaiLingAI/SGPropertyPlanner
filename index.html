@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- SG Property Planner v8.1 | Apr 2026 — Bug Fix Release -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -290,40 +289,325 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 
 </style>
 </head>
+<style>
+/* ═══ TOKENS ═══ */
+:root{
+  --bg:#0b1118;--bg2:#111b27;--bg3:#172030;--bg4:#1c2838;
+  --border:rgba(99,165,210,0.13);--border2:rgba(99,165,210,0.25);--border3:rgba(99,165,210,0.4);
+  --gold:#c8a96e;--gold2:#e8c990;--gold3:rgba(200,169,110,0.12);
+  --blue:#4a9fd4;--blue2:#63b5e8;--blue3:rgba(74,159,212,0.12);
+  --teal:#2ec4a9;--red:#e05c5c;--red3:rgba(224,92,92,0.12);
+  --green:#4caf7d;--amber:#e5a228;--purple:#9b7fe8;
+  --text:#e8eef4;--text2:#a0b4c8;--text3:#5a7a96;--text4:#3a5a74;
+  --font:'Lexend',sans-serif;
+  --radius:12px;--radius2:8px;--radius3:6px;
+  --shadow:0 4px 24px rgba(0,0,0,0.4);
+  --topbar-h:56px;--sidebar-w:220px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;font-family:var(--font)}
+html{background:#0b1118}
+body{background:#0b1118;color:#e8eef4;font-size:14px;line-height:1.6;padding-top:56px;padding-bottom:56px}
+
+/* TOPBAR */
+#topbar{position:fixed;top:0;left:0;right:0;height:56px;z-index:300;background:#111b27;border-bottom:1px solid rgba(99,165,210,0.13);display:flex;align-items:center;padding:0 16px;gap:12px}
+.logo{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:#c8a96e;white-space:nowrap}
+.logo span{font-family:var(--font);font-size:11px;color:#5a7a96;margin-left:8px}
+.topbar-tabs{display:flex;gap:2px;margin-left:12px;flex-shrink:1;overflow-x:auto;scrollbar-width:none}
+.topbar-tabs::-webkit-scrollbar{display:none}
+.ttab{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;color:#5a7a96;cursor:pointer;border:1px solid transparent;transition:all .2s;white-space:nowrap}
+.ttab:hover{color:#a0b4c8;background:#172030}
+.ttab.active{color:#c8a96e;background:rgba(200,169,110,0.12);border-color:rgba(200,169,110,0.3)}
+.ttprop{padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;color:#5a7a96;cursor:pointer;border:1px solid rgba(99,165,210,0.13);transition:all .15s;white-space:nowrap;background:#172030}
+.ttprop:hover{color:#a0b4c8}
+.ttprop.active{color:#c8a96e;border-color:rgba(200,169,110,0.4);background:rgba(200,169,110,0.12)}
+#feedback-topbar-btn{margin-left:auto;padding:5px 14px;background:rgba(74,159,212,0.12);border:1px solid rgba(74,159,212,0.3);color:#63b5e8;border-radius:20px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0;white-space:nowrap}
+
+/* BOTTOM DOCK */
+#bottom-dock{position:fixed;bottom:0;left:0;right:0;height:48px;z-index:300;background:#111b27;border-top:1px solid rgba(99,165,210,0.13);display:flex;align-items:center;padding:0 4px}
+.bd-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 4px;border-radius:6px;cursor:pointer;color:#5a7a96;font-size:15px;gap:1px;flex:1;transition:all .15s}
+.bd-tab span{font-size:8px;font-weight:500}
+.bd-tab:hover{color:#a0b4c8;background:#172030}
+.bd-tab.active{color:#c8a96e;background:rgba(200,169,110,0.12)}
+
+/* ═══ PANELS - THE ONLY LAYOUT CODE THAT MATTERS ═══ */
+.panel{display:none}
+.panel.active{display:block;background:#0b1118;color:#e8eef4}
+.panel-scroll{padding:20px 16px 40px;max-width:960px;margin:0 auto}
+.section-hdr{margin-bottom:18px}
+.section-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:#e8eef4;margin-bottom:4px}
+.section-sub{font-size:12px;color:#5a7a96}
+
+/* CALCULATOR */
+#prop-type-strip{position:sticky;top:56px;z-index:200;background:#111b27;border-bottom:1px solid rgba(99,165,210,0.13);padding:10px 16px}
+#prop-type-bar{display:flex;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:6px}
+#prop-type-bar::-webkit-scrollbar{display:none}
+#calc-split{display:block}
+#calc-left{padding:16px}
+#calc-left-scroll{display:block}
+#calc-right{padding:16px;background:#111b27}
+@media(min-width:800px){
+  #calc-split{display:grid;grid-template-columns:420px 1fr;align-items:start}
+  #calc-left{padding:20px 18px 60px;border-right:1px solid rgba(99,165,210,0.13)}
+  #calc-right{padding:20px 18px 60px}
+}
+@media(max-width:600px){
+  .logo span{display:none}
+  #topbar{padding:0 8px}
+  .ttab{padding:4px 6px;font-size:10px}
+  #topbar-prop-tabs{display:none}
+  .panel-scroll{padding:12px 12px 40px}
+}
+
+/* ── Property type tabs ── */
+
+.ptab{padding:7px 14px;border-radius:var(--radius2);border:1px solid var(--border2);color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;background:var(--bg3)}
+.ptab:hover{color:var(--text2);border-color:var(--border3)}
+.ptab.active{color:var(--gold);border-color:rgba(200,169,110,0.5);background:var(--gold3)}
+
+/* ── Cards ── */
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden}
+.card-hdr{padding:12px 16px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border)}
+.card-title{font-size:13px;font-weight:600;color:var(--text2)}
+.card-body{padding:14px 16px}
+
+/* ── Form fields ── */
+.field{margin-bottom:14px}
+.field-label{font-size:11.5px;font-weight:600;color:var(--text3);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.field-input{width:100%;padding:10px 12px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--radius2);color:var(--text);font-size:13.5px;font-family:var(--font);outline:none;transition:border-color .2s}
+.field-input:focus{border-color:var(--blue2)}
+.field-input[type=range]{padding:4px 0;background:transparent;border:none;cursor:pointer}
+.field-note{font-size:10.5px;color:var(--text3);margin-top:3px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ── Tooltip ── */
+.tip-icon{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--bg4);border:1px solid var(--border2);color:var(--text3);font-size:9px;cursor:help;flex-shrink:0;position:relative}
+.tip-icon:hover::after{content:attr(data-tip);position:absolute;left:20px;top:-4px;white-space:normal;width:220px;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--radius2);padding:8px 10px;font-size:11px;color:var(--text2);z-index:999;line-height:1.5;font-style:normal;box-shadow:var(--shadow)}
+
+/* ── Result tiles (right pane) ── */
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.res-tile{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);padding:14px}
+.res-tile-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.res-tile-val{font-size:22px;font-weight:600;color:var(--text);letter-spacing:.02em}
+.res-tile-sub{font-size:10.5px;color:var(--text3);margin-top:2px}
+.res-tile.highlight{border-color:rgba(200,169,110,0.35);background:var(--gold3)}
+.res-tile.highlight .res-tile-val{color:var(--gold)}
+.res-tile.warn{border-color:rgba(224,92,92,0.35);background:var(--red3)}
+.res-tile.warn .res-tile-val{color:var(--red)}
+
+/* ── TDSR/MSR bar ── */
+.ratio-bar-wrap{margin-bottom:12px}
+.ratio-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ratio-label{font-size:11px;color:var(--text3);width:100px;flex-shrink:0;display:flex;align-items:center;gap:4px}
+.ratio-track{flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.ratio-fill{height:100%;border-radius:3px;transition:width .4s,background .4s}
+.ratio-val{font-size:12px;font-weight:600;width:44px;text-align:right;flex-shrink:0}
+
+/* ── Danger alert ── */
+.danger-alert{background:rgba(224,92,92,0.1);border:1px solid rgba(224,92,92,0.35);border-radius:var(--radius2);padding:10px 12px;font-size:11.5px;color:var(--red);display:flex;align-items:flex-start;gap:8px;margin-bottom:12px}
+.danger-alert button{margin-left:auto;flex-shrink:0;padding:3px 10px;border-radius:8px;border:1px solid rgba(224,92,92,0.4);background:transparent;color:var(--red);font-size:10.5px;cursor:pointer;font-family:var(--font);white-space:nowrap}
+.warn-alert{background:rgba(229,162,40,0.1);border:1px solid rgba(229,162,40,0.35);border-radius:var(--radius2);padding:10px 12px;font-size:11.5px;color:var(--amber);display:flex;align-items:flex-start;gap:8px;margin-bottom:12px}
+.warn-alert button{margin-left:auto;flex-shrink:0;padding:3px 10px;border-radius:8px;border:1px solid rgba(229,162,40,0.4);background:transparent;color:var(--amber);font-size:10.5px;cursor:pointer;font-family:var(--font);white-space:nowrap}
+
+/* ── Accordion ── */
+.accordion-trigger{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg4);border:1px solid var(--border);border-radius:var(--radius2);cursor:pointer;font-size:12px;font-weight:600;color:var(--text3);margin-bottom:12px;transition:all .2s}
+.accordion-trigger:hover{color:var(--text2);border-color:var(--border2)}
+.accordion-trigger .chev{margin-left:auto;transition:transform .25s;font-size:10px}
+.accordion-body{display:none;margin-top:-6px;margin-bottom:12px;padding:12px 14px;background:var(--bg4);border:1px solid var(--border);border-radius:0 0 var(--radius2) var(--radius2);border-top:none}
+
+/* ── Stage breakdown ── */
+.stage{margin-bottom:12px}
+.stage-hdr{font-size:10px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:.6px;padding:5px 0;border-bottom:1px solid var(--border);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.stage-hdr .stage-num{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.stage-row{display:flex;align-items:center;padding:5px 0;font-size:12px;color:var(--text2);border-bottom:1px solid rgba(99,165,210,0.06)}
+.stage-row:last-child{border-bottom:none}
+.stage-row-label{flex:1}
+.stage-row-val{font-weight:600;color:var(--text)}
+.stage-row.cash .stage-row-val{color:var(--red)}
+.stage-row.cpf .stage-row-val{color:var(--teal)}
+.stage-total{display:flex;align-items:center;padding:7px 0;font-size:12px;font-weight:700;color:var(--text);border-top:1px solid var(--border);margin-top:4px}
+.stage-total-label{flex:1;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--text3)}
+
+/* ── Timeline ── */
+.tl-step{position:relative;padding:0 0 16px 36px}
+.tl-step::before{content:'';position:absolute;left:10px;top:20px;bottom:0;width:1px;background:var(--border)}
+.tl-step:last-child::before{display:none}
+.tl-dot{position:absolute;left:3px;top:4px;width:15px;height:15px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;background:var(--bg3)}
+.tl-step-hdr{display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 8px;border-radius:var(--radius2);margin-bottom:0;transition:background .15s}
+.tl-step-hdr:hover{background:var(--bg4)}
+.tl-step-title{font-size:12.5px;font-weight:600;color:var(--text)}
+.tl-step-date{font-size:11px;color:var(--text3);margin-left:auto;white-space:nowrap}
+.tl-step-amt{font-size:11px;font-weight:700;color:var(--amber)}
+.tl-step-body{padding:8px 8px 0;font-size:11.5px;color:var(--text2);line-height:1.65;display:none}
+.tl-step-body.open{display:block}
+.tl-adj{display:flex;align-items:center;gap:6px;margin-top:8px;padding:7px 10px;background:var(--bg4);border-radius:var(--radius3);flex-wrap:wrap}
+.tl-adj span{font-size:11px;color:var(--text3)}
+.tl-adj-btn{width:24px;height:24px;border-radius:4px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:var(--font)}
+.tl-date-input{padding:5px 8px;background:var(--bg3);border:1px solid var(--blue2);border-radius:var(--radius3);color:var(--text);font-size:11.5px;font-family:var(--font);outline:none}
+.tl-reset-btn{font-size:10px;padding:2px 8px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text3);cursor:pointer;font-family:var(--font)}
+
+/* ── News items ── */
+.news-item{padding:13px 0;border-bottom:1px solid var(--border);transition:opacity .2s}
+.news-item.hidden{display:none}
+.news-cat-pill{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:2px 8px;border-radius:10px;border:1px solid;margin-right:6px}
+.filter-pill{padding:4px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--text3);font-size:11px;cursor:pointer;transition:all .2s;font-family:var(--font)}
+.filter-pill.active{color:var(--gold);border-color:rgba(200,169,110,0.4);background:var(--gold3)}
+
+/* ── Doughnut chart wrap ── */
+.chart-wrap{position:relative;width:160px;height:160px;margin:0 auto 14px;flex-shrink:0}
+
+/* ── Lead gates ── */
+.gate-blur{position:relative;overflow:hidden;border-radius:var(--radius);margin-top:16px}
+.gate-blur-content{filter:blur(6px);pointer-events:none;user-select:none;padding:16px}
+.gate-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(11,17,24,0.7);backdrop-filter:blur(2px);gap:12px;padding:20px}
+.gate-cta{padding:12px 24px;background:var(--green);border:none;border-radius:var(--radius2);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:8px;transition:opacity .2s}
+.gate-cta:hover{opacity:.9}
+
+/* ── CTA buttons ── */
+.wa-btn{display:flex;align-items:center;gap:8px;padding:11px 18px;background:#25D366;border:none;border-radius:var(--radius2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:opacity .2s;text-decoration:none;width:fit-content}
+.wa-btn:hover{opacity:.9}
+.btn-outline{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid var(--border2);border-radius:var(--radius2);color:var(--text3);font-size:12px;cursor:pointer;background:transparent;font-family:var(--font);transition:all .2s}
+.btn-outline:hover{border-color:var(--border3);color:var(--text2)}
+
+/* ── Rates glance ── */
+.rg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:7px}
+.rg-tile{background:var(--bg4);border-radius:var(--radius3);padding:8px 10px}
+.rg-label{font-size:9.5px;font-weight:600;color:var(--text3);margin-bottom:2px}
+.rg-val{font-size:12px;font-weight:700}
+
+/* ── Wizard ── */
+.wizard-q{margin-bottom:16px;padding:14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2)}
+.wizard-q-label{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px}
+.wizard-opts{display:flex;gap:8px;flex-wrap:wrap}
+.wizard-opt{padding:7px 16px;border-radius:var(--radius2);border:1px solid var(--border2);background:var(--bg4);color:var(--text3);font-size:12px;cursor:pointer;transition:all .2s;font-family:var(--font)}
+.wizard-opt.selected{border-color:rgba(200,169,110,0.5);background:var(--gold3);color:var(--gold);font-weight:600}
+
+/* ── Feedback modal ── */
+#fb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center}
+#fb-overlay.open{display:flex}
+#fb-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:24px;width:min(440px,94vw);max-height:85vh;overflow-y:auto}
+
+/* ── ABSD/LTV tables ── */
+.rate-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.rate-table th{padding:8px 10px;text-align:left;font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);background:var(--bg4)}
+.rate-table td{padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text2)}
+.rate-table tr:last-child td{border-bottom:none}
+.rate-table tr:hover td{background:var(--bg4)}
+.rate-highlight{color:var(--amber);font-weight:600}
+
+/* ── Key Rules card ── */
+.key-rules{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);padding:12px 14px;margin-bottom:16px}
+.key-rules-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.key-rules-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.key-rules-links{display:flex;gap:6px}
+
+/* ── Mobile ── */
+
+  
+  
+  
+  .topbar-tabs{display:flex;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;flex-shrink:1;min-width:0}
+  .topbar-tabs::-webkit-scrollbar{display:none}
+  .logo span{display:none}
+  #feedback-topbar-btn .fb-label{display:none}
+  #topbar-prop-tabs .ttprop span{display:none}
+}
+
+  .topbar-tabs{gap:0}
+  .ttab{padding:4px 8px;font-size:11px}
+  
+  .res-grid{grid-template-columns:1fr 1fr}
+  #feedback-topbar-btn .fb-label{display:none}
+  #topbar-prop-tabs{display:none!important}
+  
+}
+
+/* ── Misc ── */
+select.field-input option{background:var(--bg4);color:var(--text)}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--bg4);border-radius:2px;outline:none;border:none!important;padding:0!important}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--blue2);cursor:pointer;border:2px solid var(--bg3)}
+.divider{height:1px;background:var(--border);margin:16px 0}
+.tag{display:inline-block;font-size:10px;padding:1px 7px;border-radius:8px;font-weight:600}
+.tag-green{background:rgba(76,175,125,0.15);color:var(--green);border:1px solid rgba(76,175,125,0.3)}
+.tag-amber{background:rgba(229,162,40,0.15);color:var(--amber);border:1px solid rgba(229,162,40,0.3)}
+.tag-red{background:rgba(224,92,92,0.15);color:var(--red);border:1px solid rgba(224,92,92,0.3)}
+.tag-blue{background:var(--blue3);color:var(--blue2);border:1px solid rgba(74,159,212,0.3)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fadein{animation:fadein .3s ease}
+hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
+
+
+  
+  
+  
+  
+  .logo span{display:none}
+  #topbar-prop-tabs .ttprop{font-size:10px;padding:3px 6px}
+}
+
+  #topbar-prop-tabs{display:none}
+  #feedback-topbar-btn .fb-label{display:none}
+}
+
+/* ═══ CALCULATOR PANEL ═══ */
+
+
+/* Prop-type strip: sticky below topbar */
+
+
+
+
+/* Default (mobile/portrait): single column */
+
+
+
+
+
+/* Wide screens (>768px): side by side */
+@media(min-width:768px){
+  
+  
+  
+  
+  
+}
+
+/* Mobile overrides */
+
+
+</style>
 <body>
 
 <!-- TOPBAR -->
 <div id="topbar">
   <div class="logo">SG Property Planner <span>by Kai Ling · CEA R058161I</span></div>
-  <div class="topbar-tabs">
-    <div class="ttab active" onclick="showPane('calc')"     id="tt-calc">Calculator</div>
-    <div class="ttab"        onclick="showPane('timeline')" id="tt-timeline">Timeline</div>
-    <div class="ttab"        onclick="showPane('costs')"    id="tt-costs">Cash Outlay</div>
-    <div class="ttab"        onclick="showPane('strategy')" id="tt-strategy">Strategy</div>
-    <div class="ttab"        onclick="showPane('rates')"    id="tt-rates">Rates</div>
-    <div class="ttab"        onclick="showPane('absd')"     id="tt-absd">ABSD</div>
-    <div class="ttab"        onclick="showPane('ltv')"      id="tt-ltv">LTV/TDSR</div>
-    <div class="ttab"        onclick="showPane('policy')"   id="tt-policy">Policy</div>
-    <div class="ttab"        onclick="showPane('tools')"    id="tt-tools">Tools</div>
-    <div class="ttab"        onclick="showPane('news')"     id="tt-news">Market News</div>
+  <div class="topbar-tabs" id="topbar-nav">
+    <div class="ttab active" id="tt-calc" onclick="showPane('calc')">Calculator</div>
+    <div class="ttab" id="tt-timeline" onclick="showPane('timeline')">Timeline</div>
+    <div class="ttab" id="tt-costs" onclick="showPane('costs')">Cash Outlay</div>
+    <div class="ttab" id="tt-strategy" onclick="showPane('strategy')">Strategy</div>
+    <div class="ttab" id="tt-rates" onclick="showPane('rates')">Rates</div>
+    <div class="ttab" id="tt-absd" onclick="showPane('absd')">ABSD</div>
+    <div class="ttab" id="tt-ltv" onclick="showPane('ltv')">LTV/TDSR</div>
+    <div class="ttab" id="tt-policy" onclick="showPane('policy')">Policy</div>
+    <div class="ttab" id="tt-tools" onclick="showPane('tools')">Tools</div>
+    <div class="ttab" id="tt-news" onclick="showPane('news')">Market News</div>
   </div>
-  <div id="topbar-prop-tabs" style="display:flex;gap:3px;margin-left:6px;flex-shrink:0;border-left:1px solid var(--border);padding-left:8px">
-    <div class="ttprop active" id="ttp-newlaunch" onclick="setPropTypeAndCalc('newlaunch',this)">New Launch</div>
-    <div class="ttprop" id="ttp-resalecondo" onclick="setPropTypeAndCalc('resalecondo',this)">Resale Condo</div>
-    <div class="ttprop" id="ttp-hdb" onclick="setPropTypeAndCalc('hdb',this)">HDB</div>
-    <div class="ttprop" id="ttp-landed" onclick="setPropTypeAndCalc('landed',this)">Landed</div>
+  <div id="topbar-prop-tabs" style="display:flex;gap:4px;flex-shrink:0">
+    <div class="ttprop active" id="tpt-newlaunch" onclick="setPropTypeAndCalc('newlaunch',this)">New Launch</div>
+    <div class="ttprop" id="tpt-resalecondo" onclick="setPropTypeAndCalc('resalecondo',this)">Resale Condo</div>
+    <div class="ttprop" id="tpt-hdb" onclick="setPropTypeAndCalc('hdb',this)">HDB</div>
+    <div class="ttprop" id="tpt-landed" onclick="setPropTypeAndCalc('landed',this)">Landed</div>
   </div>
-  <button id="feedback-topbar-btn" onclick="openFeedback()">💬 <span class="fb-label">Feedback</span></button>
+  <button id="feedback-topbar-btn" onclick="document.getElementById('fb-overlay').style.display='flex'">
+    <span>💬</span><span class="fb-label">Feedback</span>
+  </button>
 </div>
 
-<!-- SIDEBAR -->
-<div id="content">
+<!-- ALL PANELS -->
 
+<div id="panel-calc" class="panel active">
 
-<!-- ══════════════════════════════════════════
-     PANEL: CALCULATOR
-══════════════════════════════════════════ -->
-<div class="panel active" id="panel-calc">
 
   <!-- Prop type strip: always visible at top of calculator -->
   <div id="prop-type-strip">
@@ -1066,7 +1350,358 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
     <div id="news-list"></div>
   </div>
 </div>
-</div><!-- /content -->
+
+</div>
+
+<div id="panel-timeline" class="panel">
+
+  <div class="panel-scroll">
+    <div class="section-hdr">
+      <div class="section-title" id="tl-title">Transaction Timeline</div>
+      <div class="section-sub">Step-by-step dates and payments — click any step to expand</div>
+    </div>
+    <div class="field" style="max-width:240px;margin-bottom:20px">
+      <div class="field-label">Transaction Start Date</div>
+      <input class="field-input" type="date" id="tl-start-date" oninput="renderTimeline()" onchange="renderTimeline()">
+    </div>
+    <div id="timeline-container"></div>
+  </div>
+
+</div>
+
+<div id="panel-costs" class="panel">
+
+  <div class="panel-scroll">
+    <div class="section-hdr">
+      <div class="section-title">Complete Cash Outlay</div>
+      <div class="section-sub">All costs from offer to completion</div>
+    </div>
+    <div id="costs-container"></div>
+  </div>
+
+</div>
+
+<div id="panel-strategy" class="panel">
+
+  <div class="panel-scroll">
+    <div class="section-hdr">
+      <div class="section-title">Strategy Tools</div>
+      <div class="section-sub">Smart planning tools for upgraders and investors</div>
+    </div>
+
+    <!-- Sell vs Buy First -->
+    <div class="card">
+      <div class="card-hdr"><span>♟</span><span class="card-title">Sell vs Buy First — Upgrader Comparison</span></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+          <div style="padding:14px;background:rgba(76,175,125,0.08);border:1px solid rgba(76,175,125,0.25);border-radius:var(--radius2)">
+            <div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">✅ Sell First</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.7">
+              • <strong>0% ABSD</strong> on new purchase<br>
+              • Proceeds fund downpayment<br>
+              • No dual mortgage risk<br>
+              • Must find interim housing<br>
+              • Risk of missing target unit
+            </div>
+            <div style="margin-top:10px;font-size:11px;color:var(--text3)">ABSD Saved</div>
+            <div style="font-size:20px;font-weight:700;color:var(--green)" id="svb-saved">$0</div>
+          </div>
+          <div style="padding:14px;background:rgba(229,162,40,0.08);border:1px solid rgba(229,162,40,0.25);border-radius:var(--radius2)">
+            <div style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">⚠ Buy First</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.7">
+              • ABSD 20% upfront (SC 2nd)<br>
+              • ABSD refundable if HDB sold in 6 months<br>
+              • Concurrent mortgage stress<br>
+              • Secure your unit first<br>
+              • Needs strong cash reserves
+            </div>
+            <div style="margin-top:10px;font-size:11px;color:var(--text3)">ABSD Cashflow Hit</div>
+            <div style="font-size:20px;font-weight:700;color:var(--amber)" id="svb-hit">$0</div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">New property purchase price (for ABSD calc)</div>
+          <input class="field-input" type="text" id="svb-price" value="1,200,000" inputmode="numeric" oninput="fmtInput(this);calcSVB()">
+        </div>
+        <div style="padding:10px 12px;background:var(--bg4);border-radius:var(--radius3);font-size:12px;color:var(--text3);margin-top:4px">
+          Based on SC buying 2nd property (20% ABSD). ABSD remission applies if existing HDB sold within 6 months of new private purchase completion.
+        </div>
+        <div style="margin-top:12px">
+          <a href="https://wa.me/6589089011?text=Hi Kai Ling, I need help planning my sell vs buy first strategy." target="_blank" rel="noopener" class="wa-btn" style="font-size:12px">
+            💬 Discuss my Upgrader Strategy
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Decoupling Wizard -->
+    <div class="card">
+      <div class="card-hdr"><span>🔗</span><span class="card-title">Decoupling Feasibility Wizard</span></div>
+      <div class="card-body">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Decoupling transfers one owner's share to the other, freeing up a "first property slot" to buy a new property at 0% ABSD.</div>
+
+        <div class="wizard-q">
+          <div class="wizard-q-label">1. Are you married?</div>
+          <div class="wizard-opts">
+            <div class="wizard-opt" onclick="wizardPick(this,'married','yes')">Yes</div>
+            <div class="wizard-opt" onclick="wizardPick(this,'married','no')">No</div>
+          </div>
+        </div>
+        <div class="wizard-q">
+          <div class="wizard-q-label">2. Current holding type?</div>
+          <div class="wizard-opts">
+            <div class="wizard-opt" onclick="wizardPick(this,'holding','joint')">Joint Tenancy</div>
+            <div class="wizard-opt" onclick="wizardPick(this,'holding','tenancy')">Tenancy in Common</div>
+          </div>
+        </div>
+        <div class="wizard-q">
+          <div class="wizard-q-label">3. Can each spouse qualify individually for TDSR?</div>
+          <div class="wizard-opts">
+            <div class="wizard-opt" onclick="wizardPick(this,'tdsr','yes')">Yes — both earn enough</div>
+            <div class="wizard-opt" onclick="wizardPick(this,'tdsr','no')">No — combined income needed</div>
+          </div>
+        </div>
+        <div id="decouple-result" style="display:none;margin-top:12px;padding:12px;border-radius:var(--radius2)"></div>
+        <div style="margin-top:12px">
+          <a href="https://wa.me/6589089011?text=Hi Kai Ling, I would like to assess decoupling feasibility for my property." target="_blank" rel="noopener" class="wa-btn" style="font-size:12px">
+            💬 Get Decoupling Assessment
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rental Yield Calculator -->
+    <div class="card">
+      <div class="card-hdr"><span>📈</span><span class="card-title">Rental Yield Calculator</span></div>
+      <div class="card-body">
+        <div class="field-row" style="margin-bottom:10px">
+          <div class="field" style="margin-bottom:0">
+            <div class="field-label">Property Price</div>
+            <input class="field-input" type="text" id="ry-price" value="1,200,000" inputmode="numeric" oninput="fmtInput(this);calcRY()">
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <div class="field-label">Monthly Rent</div>
+            <input class="field-input" type="text" id="ry-rent" value="3,500" inputmode="numeric" oninput="fmtInput(this);calcRY()">
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Monthly Costs (MCST + tax)</div>
+          <input class="field-input" type="text" id="ry-costs" value="500" inputmode="numeric" oninput="fmtInput(this);calcRY()">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+          <div style="background:var(--bg4);border-radius:var(--radius3);padding:12px;text-align:center">
+            <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Gross Yield</div>
+            <div style="font-size:24px;font-weight:700;color:var(--teal)" id="ry-gross">0.0%</div>
+          </div>
+          <div style="background:var(--bg4);border-radius:var(--radius3);padding:12px;text-align:center">
+            <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Net Yield</div>
+            <div style="font-size:24px;font-weight:700;color:var(--green)" id="ry-net">0.0%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="panel-tools" class="panel">
+
+  <div class="panel-scroll">
+    <div class="section-hdr">
+      <div class="section-title">Additional Tools</div>
+      <div class="section-sub">Pitfalls, property flow, and more</div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span>⚑</span><span class="card-title">Common Pitfalls & Dangers</span></div>
+      <div class="card-body" id="pitfalls-body">
+        <div style="font-size:12px;color:var(--text3)">Select a property type and calculate first to see relevant pitfalls.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span>🏠</span><span class="card-title">Property Transaction Flow</span></div>
+      <div class="card-body" id="flow-body">
+        <div style="font-size:12px;color:var(--text3)">Property flow diagram appears here after calculation.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="panel-rates" class="panel">
+
+  <div class="panel-scroll">
+    <div class="section-hdr">
+      <div class="section-title">Current Mortgage Rates</div>
+      <div class="section-sub">Singapore bank rates — updated regularly. Always verify with your bank before committing.</div>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px">📊 Key Rate Summary (Apr 2026)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:var(--bg4);border-radius:var(--radius2);padding:10px 12px"><div style="font-size:10px;color:var(--text3);margin-bottom:3px">Fixed 2-Year (Bank)</div><div style="font-size:18px;font-weight:700;color:var(--teal)">1.40–1.80%</div></div>
+        <div style="background:var(--bg4);border-radius:var(--radius2);padding:10px 12px"><div style="font-size:10px;color:var(--text3);margin-bottom:3px">Floating SORA (3M+spread)</div><div style="font-size:18px;font-weight:700;color:var(--blue2)">1.45–1.60%</div></div>
+        <div style="background:var(--bg4);border-radius:var(--radius2);padding:10px 12px"><div style="font-size:10px;color:var(--text3);margin-bottom:3px">HDB Concessionary</div><div style="font-size:18px;font-weight:700;color:var(--gold)">2.60%</div></div>
+        <div style="background:var(--bg4);border-radius:var(--radius2);padding:10px 12px"><div style="font-size:10px;color:var(--text3);margin-bottom:3px">3M SORA (benchmark)</div><div style="font-size:18px;font-weight:700;color:var(--amber)">~1.20%</div></div>
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">🏦 Bank Packages (Indicative)</div>
+    <div style="overflow-x:auto;margin-bottom:16px">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead><tr style="background:var(--bg4)">
+          <th style="padding:8px 10px;text-align:left;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border)">Bank</th>
+          <th style="padding:8px 10px;text-align:right;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border)">Fixed 2yr</th>
+          <th style="padding:8px 10px;text-align:right;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border)">Fixed 3yr</th>
+          <th style="padding:8px 10px;text-align:right;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border)">SORA 3M</th>
+          <th style="padding:8px 10px;text-align:left;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border)">Lock-in</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:8px 10px;color:var(--text)">DBS</td><td style="padding:8px 10px;text-align:right;color:var(--teal);font-weight:600">1.60%</td><td style="padding:8px 10px;text-align:right;color:var(--teal)">1.75%</td><td style="padding:8px 10px;text-align:right;color:var(--blue2)">SORA+0.80%</td><td style="padding:8px 10px;color:var(--text3)">2 yrs</td></tr>
+          <tr style="background:var(--bg4)"><td style="padding:8px 10px;color:var(--text)">OCBC</td><td style="padding:8px 10px;text-align:right;color:var(--teal);font-weight:600">1.45%</td><td style="padding:8px 10px;text-align:right;color:var(--teal)">1.65%</td><td style="padding:8px 10px;text-align:right;color:var(--blue2)">SORA+0.75%</td><td style="padding:8px 10px;color:var(--text3)">2 yrs</td></tr>
+          <tr><td style="padding:8px 10px;color:var(--text)">UOB</td><td style="padding:8px 10px;text-align:right;color:var(--teal);font-weight:600">1.65%</td><td style="padding:8px 10px;text-align:right;color:var(--teal)">1.80%</td><td style="padding:8px 10px;text-align:right;color:var(--blue2)">SORA+0.80%</td><td style="padding:8px 10px;color:var(--text3)">2 yrs</td></tr>
+          <tr style="background:var(--bg4)"><td style="padding:8px 10px;color:var(--text)">Standard Chartered</td><td style="padding:8px 10px;text-align:right;color:var(--teal);font-weight:600">1.40%</td><td style="padding:8px 10px;text-align:right;color:var(--teal)">1.58%</td><td style="padding:8px 10px;text-align:right;color:var(--blue2)">SORA+0.70%</td><td style="padding:8px 10px;color:var(--text3)">2 yrs</td></tr>
+          <tr><td style="padding:8px 10px;color:var(--text)">HSBC</td><td style="padding:8px 10px;text-align:right;color:var(--teal);font-weight:600">1.50%</td><td style="padding:8px 10px;text-align:right;color:var(--teal)">1.68%</td><td style="padding:8px 10px;text-align:right;color:var(--blue2)">SORA+0.75%</td><td style="padding:8px 10px;color:var(--text3)">2 yrs</td></tr>
+          <tr style="background:var(--bg4)"><td style="padding:8px 10px;color:var(--text)">Maybank</td><td style="padding:8px 10px;text-align:right;color:var(--teal);font-weight:600">1.55%</td><td style="padding:8px 10px;text-align:right;color:var(--teal)">1.72%</td><td style="padding:8px 10px;text-align:right;color:var(--blue2)">SORA+0.80%</td><td style="padding:8px 10px;color:var(--text3)">2 yrs</td></tr>
+          <tr style="background:var(--bg3)"><td style="padding:8px 10px;color:var(--gold);font-weight:700">HDB Loan</td><td style="padding:8px 10px;text-align:right;color:var(--gold);font-weight:700">2.60%</td><td style="padding:8px 10px;text-align:right;color:var(--gold)">2.60%</td><td style="padding:8px 10px;text-align:right;color:var(--text3)">N/A</td><td style="padding:8px 10px;color:var(--text3)">No lock-in</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">💡 Quick Mortgage Calculator</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div><div style="font-size:11px;color:var(--text3);margin-bottom:3px">Loan Amount ($)</div><input class="field-input" type="text" id="rates-loan" placeholder="900,000" inputmode="numeric" oninput="fmtInput(this);calcRates()"></div>
+        <div><div style="font-size:11px;color:var(--text3);margin-bottom:3px">Rate (% p.a.)</div><input class="field-input" type="number" id="rates-rate" value="2.50" step="0.05" min="0.5" max="8" oninput="calcRates()"></div>
+        <div><div style="font-size:11px;color:var(--text3);margin-bottom:3px">Tenure (years)</div><input class="field-input" type="number" id="rates-tenure" value="25" min="5" max="35" oninput="calcRates()"></div>
+        <div style="display:flex;align-items:flex-end"><button onclick="calcRates()" style="width:100%;padding:9px;background:var(--gold);color:var(--bg);border:none;border-radius:var(--radius2);font-weight:700;font-size:12px;cursor:pointer">Calculate</button></div>
+      </div>
+      <div id="rates-result" style="background:var(--bg4);border-radius:var(--radius2);padding:12px;display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:12px;color:var(--text3)">Monthly Payment</span><span id="rates-monthly" style="font-size:20px;font-weight:700;color:var(--gold)">—</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--text3)">Total Interest</span><span id="rates-interest" style="font-size:12px;font-weight:600;color:var(--amber)">—</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--text3)">Total Paid</span><span id="rates-interest-total" style="font-size:12px;font-weight:600;color:var(--text)">—</span></div>
+      </div>
+    </div>
+    <div style="padding:10px 12px;background:rgba(200,169,110,0.08);border-left:3px solid var(--gold);border-radius:0 var(--radius2) var(--radius2) 0;font-size:11px;color:var(--text3);line-height:1.7">
+      ⚠ Rates are indicative. Always get an In-Principle Approval (IPA) from your bank first.<br>
+      <strong style="color:var(--gold)">Want personalised rate advice?</strong> <a href="https://wa.me/6589089011?text=Hi Kai Ling, I need help comparing mortgage rates." style="color:var(--teal);text-decoration:none">WhatsApp Kai Ling →</a>
+    </div>
+  </div>
+
+</div>
+
+<div id="panel-absd" class="panel">
+
+  <div class="panel-scroll">
+    <div class="section-hdr">
+      <div class="section-title">ABSD Rates 2026</div>
+      <div class="section-sub">Additional Buyer's Stamp Duty — effective Apr 2023</div>
+    </div>
+    <div class="card">
+      <div class="card-body" style="padding:0">
+        <table class="rate-table">
+          <thead><tr><th>Buyer Profile</th><th>1st Property</th><th>2nd Property</th><th>3rd+</th></tr></thead>
+          <tbody>
+            <tr><td>Singapore Citizen (SC)</td><td class="rate-highlight">0%</td><td class="rate-highlight">20%</td><td>30%</td></tr>
+            <tr><td>Permanent Resident (PR)</td><td class="rate-highlight">5%</td><td class="rate-highlight">30%</td><td>35%</td></tr>
+            <tr><td>Foreigner</td><td class="rate-highlight" style="color:var(--red)">60%</td><td style="color:var(--red)">60%</td><td style="color:var(--red)">60%</td></tr>
+            <tr><td>Entity / Company</td><td style="color:var(--red)">65%</td><td style="color:var(--red)">65%</td><td style="color:var(--red)">65%</td></tr>
+            <tr><td colspan="4" style="padding:8px 10px;font-size:11px;color:var(--text3)">For joint purchases, the higher ABSD rate applies. Married SC couples buying together: 0% on 1st, 20% on 2nd.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span>⚡</span><span class="card-title">ABSD Remission Rules</span></div>
+      <div class="card-body">
+        <div style="font-size:12.5px;color:var(--text2);line-height:1.8">
+          <strong>SC couples upgrading from HDB:</strong> ABSD paid upfront, fully refunded if existing HDB resale is completed within 6 months of new private property purchase.<br><br>
+          <strong>Decoupling:</strong> One spouse transfers their share to the other, freeing a "first property" slot to purchase a second property at 0% ABSD. Subject to TDSR individual qualification.<br><br>
+          <strong>Developers (licensed housing developers):</strong> ABSD remittable under specific conditions.<br><br>
+          <strong>Trusts:</strong> 65% ABSD applies regardless of beneficial owner's profile.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="panel-ltv" class="panel">
+
+  <div class="panel-scroll">
+    <div class="section-hdr">
+      <div class="section-title">LTV, TDSR & MSR Rules</div>
+      <div class="section-sub">MAS regulations effective 2026</div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span>🏦</span><span class="card-title">Bank Loan LTV (Private Property)</span></div>
+      <div class="card-body" style="padding:0">
+        <table class="rate-table">
+          <thead><tr><th>Existing Loans</th><th>LTV Limit</th><th>Min Cash</th><th>Min Cash+CPF</th></tr></thead>
+          <tbody>
+            <tr id="ltv-row-0"><td>0 loans</td><td>75%</td><td>5%</td><td>25%</td></tr>
+            <tr id="ltv-row-1"><td>1 loan</td><td>45%</td><td>25%</td><td>55%</td></tr>
+            <tr id="ltv-row-2"><td>2+ loans</td><td>35%</td><td>25%</td><td>65%</td></tr>
+            <tr><td colspan="4" style="font-size:11px;color:var(--amber);padding:8px 10px">⚠ If tenure &gt;30 years OR (age + tenure) &gt;65: LTV drops to 55% / 25% / 15%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span>🏠</span><span class="card-title">HDB Concessionary Loan</span></div>
+      <div class="card-body">
+        <div class="rg-grid" style="margin-bottom:10px">
+          <div class="rg-tile"><div class="rg-label">Interest Rate</div><div class="rg-val" style="color:var(--blue2)">2.60% p.a.</div></div>
+          <div class="rg-tile"><div class="rg-label">LTV</div><div class="rg-val" style="color:var(--teal)">75%</div></div>
+          <div class="rg-tile"><div class="rg-label">Max Tenure</div><div class="rg-val">25 years</div></div>
+          <div class="rg-tile"><div class="rg-label">Min Downpayment</div><div class="rg-val">25% (cash/CPF)</div></div>
+        </div>
+        <div style="font-size:11.5px;color:var(--text3);line-height:1.7">At least one buyer must be a Singapore Citizen. No LTV reduction for concurrent loans — buyers must have disposed of existing HDB flat. Min cash outlay: $5,000 (deposit, paid before submission).</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span>📊</span><span class="card-title">TDSR & MSR</span></div>
+      <div class="card-body">
+        <div class="rg-grid">
+          <div class="rg-tile"><div class="rg-label">TDSR Cap</div><div class="rg-val" style="color:var(--amber)">55%</div><div style="font-size:9.5px;color:var(--text3);margin-top:2px">All property types</div></div>
+          <div class="rg-tile"><div class="rg-label">MSR Cap</div><div class="rg-val" style="color:var(--teal)">30%</div><div style="font-size:9.5px;color:var(--text3);margin-top:2px">HDB & EC only</div></div>
+          <div class="rg-tile"><div class="rg-label">Stress Rate</div><div class="rg-val">varies</div><div style="font-size:9.5px;color:var(--text3);margin-top:2px">Banks apply internal buffer</div></div>
+          <div class="rg-tile"><div class="rg-label">SORA 3M</div><div class="rg-val" style="color:var(--blue2)">~1.20%</div><div style="font-size:9.5px;color:var(--text3);margin-top:2px">Apr 2026 est.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="panel-policy" class="panel">
+
+  <div class="panel-scroll">
+    <div class="section-hdr">
+      <div class="section-title">Policy Updates</div>
+      <div class="section-sub">Key regulatory changes 2023–2026</div>
+    </div>
+    <div id="policy-list"></div>
+  </div>
+
+</div>
+
+<div id="panel-news" class="panel">
+
+  <div class="panel-scroll">
+    <div class="section-hdr">
+      <div class="section-title">SG Property Digest</div>
+      <div class="section-sub" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span id="news-freshness" style="font-size:11px;color:var(--text3)"></span>
+        <button onclick="fetchLiveNews()" style="padding:3px 10px;border-radius:12px;border:1px solid var(--border2);background:var(--bg4);color:var(--text3);font-size:11px;cursor:pointer;font-family:var(--font)">🌐 Live Update</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px" id="news-filters"></div>
+    <div style="position:relative;margin-bottom:14px">
+      <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3)">🔍</span>
+      <input type="text" placeholder="Search news…" id="news-search" oninput="filterNews('__current__',null)" style="width:100%;padding:9px 12px 9px 32px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);color:var(--text);font-size:12.5px;font-family:var(--font);outline:none">
+    </div>
+    <div id="news-list"></div>
+  </div>
+
+</div>
+
 
 <!-- FEEDBACK MODAL -->
 <div id="fb-overlay" onclick="if(event.target===this)closeFeedback()">
@@ -1085,15 +1720,45 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
       <div id="fb-list" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:8px"></div>
     </div>
   </div><!-- /fb-modal -->
-</div><!-- /fb-overlay -->
 
 
+<!-- AGENT BUBBLE -->
+<!-- AGENT BUBBLE -->
+<div id="agent-bubble" style="position:fixed;bottom:20px;right:20px;z-index:500;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+  <div id="agent-card-full" style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:14px 16px;width:240px;box-shadow:var(--shadow);animation:fadein .3s ease">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="width:40px;height:40px;border-radius:50%;background:var(--gold3);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">👩‍💼</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text)">Koh Kai Ling</div>
+        <div style="font-size:10.5px;color:var(--text3)">CEA R058161I · FM Investment Global</div>
+      </div>
+      <button onclick="minimizeBubble()" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:2px">×</button>
+    </div>
+    <div style="font-size:11.5px;color:var(--text2);margin-bottom:10px;line-height:1.55">Need personalised advice on your property strategy? I'm here to help — free consultation, no obligations.</div>
+    <a href="https://wa.me/6589089011?text=Hi Kai Ling, I used the SG Property Planner and would like a consultation." target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:7px;padding:9px;background:#25D366;border-radius:var(--radius2);color:#fff;font-size:12.5px;font-weight:700;text-decoration:none">
+      💬 WhatsApp Me
+    </a>
+  </div>
+  <div id="agent-bubble-mini" onclick="expandBubble()" style="display:none;width:52px;height:52px;border-radius:50%;background:#25D366;border:3px solid #fff;box-shadow:0 4px 16px rgba(37,211,102,0.4);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:22px">💬</div>
+</div>
+
+<!-- BOTTOM DOCK -->
+<div id="bottom-dock" style="position:fixed;bottom:0;left:0;right:0;z-index:250;background:var(--bg2);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 12px;height:48px;gap:4px;overflow-x:auto;scrollbar-width:none">
+  <div onclick="showPane('calc')"     id="bd-calc"     class="bd-tab active">⊞<span>Calc</span></div>
+  <div onclick="showPane('timeline')" id="bd-timeline" class="bd-tab">◷<span>Timeline</span></div>
+  <div onclick="showPane('costs')"    id="bd-costs"    class="bd-tab">💵<span>Costs</span></div>
+  <div onclick="showPane('strategy')" id="bd-strategy" class="bd-tab">♟<span>Strategy</span></div>
+  <div onclick="showPane('rates')"    id="bd-rates"    class="bd-tab">📈<span>Rates</span></div>
+  <div onclick="showPane('absd')"     id="bd-absd"     class="bd-tab">◈<span>ABSD</span></div>
+  <div onclick="showPane('ltv')"      id="bd-ltv"      class="bd-tab">◉<span>LTV</span></div>
+  <div onclick="showPane('policy')"   id="bd-policy"   class="bd-tab">📋<span>Policy</span></div>
+  <div onclick="showPane('tools')"    id="bd-tools"    class="bd-tab">🔧<span>Tools</span></div>
+  <div onclick="showPane('news')"     id="bd-news"     class="bd-tab">📰<span>News</span></div>
 
 
-
-
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
+
 
 
 'use strict';
@@ -2317,11 +2982,11 @@ function showPane(id){
   var nav = [document.getElementById('tt-'+id), document.getElementById('snav-'+id), document.getElementById('bd-'+id)];
   for(var k=0;k<nav.length;k++) if(nav[k]) nav[k].classList.add('active');
 
-  try { if(id==='timeline') renderTimeline(); } catch(e){}
-  try { if(id==='costs')    renderCosts();    } catch(e){}
-  try { if(id==='news')     fetchLatestNews();} catch(e){}
-  try { if(id==='rates')    calcRates();      } catch(e){}
-  try { if(id==='policy')   renderPolicy();   } catch(e){}
+  if(id==='timeline') renderTimeline();
+  if(id==='costs')    renderCosts();
+  if(id==='news')     fetchLatestNews();
+  if(id==='rates')    calcRates();
+  if(id==='policy')   renderPolicy();
   window.scrollTo(0,0);
 }
 
@@ -2702,52 +3367,7 @@ function expandBubble(){
 window.addEventListener('load',function(){
   setTimeout(function(){ minimizeBubble(); },3000);
 });
+
 </script>
-
-<!-- AGENT BUBBLE -->
-<div id="agent-bubble" style="position:fixed;bottom:20px;right:20px;z-index:500;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-  <div id="agent-card-full" style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:14px 16px;width:240px;box-shadow:var(--shadow);animation:fadein .3s ease">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-      <div style="width:40px;height:40px;border-radius:50%;background:var(--gold3);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">👩‍💼</div>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--text)">Koh Kai Ling</div>
-        <div style="font-size:10.5px;color:var(--text3)">CEA R058161I · FM Investment Global</div>
-      </div>
-      <button onclick="minimizeBubble()" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:2px">×</button>
-    </div>
-    <div style="font-size:11.5px;color:var(--text2);margin-bottom:10px;line-height:1.55">Need personalised advice on your property strategy? I'm here to help — free consultation, no obligations.</div>
-    <a href="https://wa.me/6589089011?text=Hi Kai Ling, I used the SG Property Planner and would like a consultation." target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:7px;padding:9px;background:#25D366;border-radius:var(--radius2);color:#fff;font-size:12.5px;font-weight:700;text-decoration:none">
-      💬 WhatsApp Me
-    </a>
-  </div>
-  <div id="agent-bubble-mini" onclick="expandBubble()" style="display:none;width:52px;height:52px;border-radius:50%;background:#25D366;border:3px solid #fff;box-shadow:0 4px 16px rgba(37,211,102,0.4);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:22px">💬</div>
-</div>
-
-
-<!-- BOTTOM FIXED DOCK -->
-<div id="bottom-dock" style="position:fixed;bottom:0;left:0;right:0;z-index:250;background:var(--bg2);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 12px;height:48px;gap:4px;overflow-x:auto;scrollbar-width:none">
-  <div onclick="showPane('calc')"     id="bd-calc"     class="bd-tab active">⊞<span>Calc</span></div>
-  <div onclick="showPane('timeline')" id="bd-timeline" class="bd-tab">◷<span>Timeline</span></div>
-  <div onclick="showPane('costs')"    id="bd-costs"    class="bd-tab">💵<span>Costs</span></div>
-  <div onclick="showPane('strategy')" id="bd-strategy" class="bd-tab">♟<span>Strategy</span></div>
-  <div onclick="showPane('rates')"    id="bd-rates"    class="bd-tab">📈<span>Rates</span></div>
-  <div onclick="showPane('absd')"     id="bd-absd"     class="bd-tab">◈<span>ABSD</span></div>
-  <div onclick="showPane('ltv')"      id="bd-ltv"      class="bd-tab">◉<span>LTV</span></div>
-  <div onclick="showPane('policy')"   id="bd-policy"   class="bd-tab">📋<span>Policy</span></div>
-  <div onclick="showPane('tools')"    id="bd-tools"    class="bd-tab">🔧<span>Tools</span></div>
-  <div onclick="showPane('news')"     id="bd-news"     class="bd-tab">📰<span>News</span></div>
-</div>
-<style>
-.bd-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 8px;border-radius:8px;cursor:pointer;color:var(--text3);font-size:14px;gap:1px;white-space:nowrap;flex-shrink:0;transition:all .15s;min-width:44px}
-.bd-tab span{font-size:9px;font-weight:500}
-.bd-tab:hover{color:var(--text2);background:var(--bg3)}
-.bd-tab.active{color:var(--gold);background:var(--gold3)}
-/* Add bottom padding to all panel-scroll so content isn't hidden behind dock */
-
-
-
-/* Agent bubble raised above dock */
-#agent-bubble{bottom:58px!important}
-</style>
 </body>
 </html>
