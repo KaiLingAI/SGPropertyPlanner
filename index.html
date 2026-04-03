@@ -19,25 +19,13 @@
   --font:'Lexend',sans-serif;
   --radius:12px;--radius2:8px;--radius3:6px;
   --shadow:0 4px 24px rgba(0,0,0,0.4);
-  --topbar-h:56px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;font-family:var(--font)}
-html{background:var(--bg)}
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-size:14px;
-  line-height:1.6;
-  padding-top:56px;   /* always clear the fixed topbar */
-  padding-bottom:56px; /* always clear the fixed bottom dock */
-}
+html{background:var(--bg);scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;padding-top:56px;padding-bottom:56px}
  
 /* TOPBAR */
-#topbar{
-  position:fixed;top:0;left:0;right:0;height:56px;z-index:300;
-  background:var(--bg2);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 16px;gap:12px;
-}
+#topbar{position:fixed;top:0;left:0;right:0;height:56px;z-index:300;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px}
 .logo{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--gold);white-space:nowrap}
 .logo span{font-family:var(--font);font-size:11px;color:var(--text3);margin-left:8px}
 .topbar-tabs{display:flex;gap:2px;margin-left:12px;flex-shrink:1;overflow-x:auto;scrollbar-width:none}
@@ -46,69 +34,43 @@ body{
 .ttab:hover{color:var(--text2);background:var(--bg3)}
 .ttab.active{color:var(--gold);background:var(--gold3);border-color:rgba(200,169,110,0.3)}
 .ttprop{padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;color:var(--text3);cursor:pointer;border:1px solid var(--border);transition:all .15s;white-space:nowrap;background:var(--bg3)}
-.ttprop:hover{color:var(--text2)}
-.ttprop.active{color:var(--gold);border-color:rgba(200,169,110,0.4);background:var(--gold3)}
+.ttprop:hover{color:var(--text2)}.ttprop.active{color:var(--gold);border-color:rgba(200,169,110,0.4);background:var(--gold3)}
 #feedback-topbar-btn{margin-left:auto;padding:5px 14px;background:var(--blue3);border:1px solid rgba(74,159,212,0.3);color:var(--blue2);border-radius:20px;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0;white-space:nowrap}
  
 /* BOTTOM DOCK */
-#bottom-dock{
-  position:fixed;bottom:0;left:0;right:0;height:48px;z-index:300;
-  background:var(--bg2);border-top:1px solid var(--border);
-  display:flex;align-items:center;padding:0 4px;
-}
+#bottom-dock{position:fixed;bottom:0;left:0;right:0;height:48px;z-index:300;background:var(--bg2);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 4px}
 .bd-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 4px;border-radius:6px;cursor:pointer;color:var(--text3);font-size:15px;gap:1px;flex:1;transition:all .15s}
 .bd-tab span{font-size:8px;font-weight:500}
-.bd-tab:hover{color:var(--text2);background:var(--bg3)}
-.bd-tab.active{color:var(--gold);background:var(--gold3)}
+.bd-tab:hover{color:var(--text2);background:var(--bg3)}.bd-tab.active{color:var(--gold);background:var(--gold3)}
  
-/* CONTENT wrapper */
-#content{display:block}
- 
-/* ALL PANELS: hidden by default */
+/* PANEL: always block, hidden via JS only when another tab is active */
+/* Default: ALL panels hidden */
 .panel{display:none}
- 
-/* ACTIVE PANEL: just show it, body already has padding */
+/* JS sets display:block on active panel */
 .panel.active{display:block}
  
-/* panel-scroll: padding for readability */
-.panel-scroll{padding:16px 16px 24px;max-width:960px;margin:0 auto}
- 
-/* section headers */
-.section-hdr{margin-bottom:18px}
+.section-hdr{margin-bottom:18px;padding-top:8px}
 .section-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:var(--text);margin-bottom:4px}
 .section-sub{font-size:12px;color:var(--text3)}
+.panel-scroll{padding:16px 16px 24px;max-width:960px;margin:0 auto}
  
-/* CALCULATOR: prop-type strip + split */
-#prop-type-strip{
-  position:sticky;top:56px;z-index:200;
-  background:var(--bg2);border-bottom:1px solid var(--border);
-  padding:10px 16px;margin:-0px;
-}
+/* CALCULATOR */
+#prop-type-strip{position:sticky;top:56px;z-index:200;background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px}
 #prop-type-bar{display:flex;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:6px}
 #prop-type-bar::-webkit-scrollbar{display:none}
- 
-/* Mobile: single column */
 #calc-split{display:block}
 #calc-left{padding:16px}
 #calc-left-scroll{display:block}
 #calc-right{padding:16px;background:var(--bg2)}
- 
-/* Desktop >=800px: side by side */
 @media(min-width:800px){
   #calc-split{display:grid;grid-template-columns:420px 1fr;align-items:start}
   #calc-left{padding:20px 18px 40px;border-right:1px solid var(--border)}
   #calc-right{padding:20px 18px 40px}
 }
- 
-/* Mobile */
 @media(max-width:600px){
-  #topbar{padding:0 8px}
-  .logo span{display:none}
-  .ttab{padding:4px 6px;font-size:10px}
-  #topbar-prop-tabs{display:none}
-  #feedback-topbar-btn .fb-label{display:none}
-  .panel-scroll{padding:12px}
-  #calc-left,#calc-right{padding:12px}
+  #topbar{padding:0 8px}.logo span{display:none}.ttab{padding:4px 6px;font-size:10px}
+  #topbar-prop-tabs{display:none}#feedback-topbar-btn .fb-label{display:none}
+  .panel-scroll{padding:12px}#calc-left,#calc-right{padding:12px}
 }
 /* ── Property type tabs ── */
  
@@ -752,7 +714,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 <!-- ══════════════════════════════════════════
      PANEL: TIMELINE
 ══════════════════════════════════════════ -->
-<div class="panel" id="panel-timeline">
+<div class="panel" id="panel-timeline" style="background:#1a0a2e;border-top:4px solid #c8a96e">
   <div class="panel-scroll">
     <div class="section-hdr">
       <div class="section-title" id="tl-title">Transaction Timeline</div>
@@ -769,7 +731,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 <!-- ══════════════════════════════════════════
      PANEL: CASH OUTLAY
 ══════════════════════════════════════════ -->
-<div class="panel" id="panel-costs">
+<div class="panel" id="panel-costs" style="background:#0a1a2e;border-top:4px solid #2ec4a9">
   <div class="panel-scroll">
     <div class="section-hdr">
       <div class="section-title">Complete Cash Outlay</div>
@@ -782,7 +744,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 <!-- ══════════════════════════════════════════
      PANEL: STRATEGY (Module 5)
 ══════════════════════════════════════════ -->
-<div class="panel" id="panel-strategy">
+<div class="panel" id="panel-strategy" style="background:#2e0a0a;border-top:4px solid #e05c5c">
   <div class="panel-scroll">
     <div class="section-hdr">
       <div class="section-title">Strategy Tools</div>
@@ -2344,30 +2306,28 @@ function loadFeedback(){
 // PANE NAVIGATION
 // ══════════════════════════════════════════
 function showPane(id){
-  // Hide all panels
-  document.querySelectorAll('.panel').forEach(function(p){
-    p.style.display = 'none';
-    p.classList.remove('active');
-  });
-  // Show the requested panel
-  var panel = document.getElementById('panel-' + id);
-  if(panel){
-    panel.style.display = 'block';
-    panel.classList.add('active');
+  alert('showPane: ' + id);
+  try {
+  var all = document.querySelectorAll('.panel');
+  for(var i=0;i<all.length;i++){
+    all[i].classList.remove('active');
+    all[i].style.display='none';
   }
-  // Update navigation highlights
-  document.querySelectorAll('.snav,.ttab,.bd-tab').forEach(function(el){ el.classList.remove('active'); });
-  var els = [document.getElementById('snav-'+id), document.getElementById('tt-'+id), document.getElementById('bd-'+id)];
-  els.forEach(function(el){ if(el) el.classList.add('active'); });
-  // Render dynamic content
+  var p = document.getElementById('panel-'+id);
+  if(p){ p.classList.add('active'); p.style.display='block'; }
+ 
+  var navEls = document.querySelectorAll('.ttab,.snav,.bd-tab');
+  for(var j=0;j<navEls.length;j++) navEls[j].classList.remove('active');
+  var nav = [document.getElementById('tt-'+id), document.getElementById('snav-'+id), document.getElementById('bd-'+id)];
+  for(var k=0;k<nav.length;k++) if(nav[k]) nav[k].classList.add('active');
+ 
   if(id==='timeline') renderTimeline();
   if(id==='costs')    renderCosts();
   if(id==='news')     fetchLatestNews();
   if(id==='rates')    calcRates();
   if(id==='policy')   renderPolicy();
-  // Scroll to top
   window.scrollTo(0,0);
-  document.querySelector('#content').scrollTop = 0;
+  } catch(e) { alert('ERROR: ' + e.message); }
 }
  
 // ══════════════════════════════════════════
@@ -2581,9 +2541,10 @@ function onFundsSlide(){
   renderFunds();
 }
 window.addEventListener('load',()=>{
-  document.querySelectorAll('.panel').forEach(function(p){ p.style.display='none'; });
-  var initCalc = document.getElementById('panel-calc');
-  if(initCalc){ initCalc.style.display='block'; }
+  var ap=document.querySelectorAll('.panel');
+  for(var i=0;i<ap.length;i++){ap[i].style.display='none';}
+  var ic=document.getElementById('panel-calc');
+  if(ic){ic.style.display='block';ic.classList.add('active');}
   // Default date
   const todayStr=new Date().toISOString().split('T')[0];
   const tld=document.getElementById('tl-start-date');
@@ -2795,4 +2756,3 @@ window.addEventListener('load',function(){
 </style>
 </body>
 </html>
- 
