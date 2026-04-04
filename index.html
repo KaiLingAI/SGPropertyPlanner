@@ -21,7 +21,7 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;font-family:var(--font)}
 html{background:var(--bg);scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;padding-top:56px;padding-bottom:56px}
+body{background:#0b1118;color:#e8eef4;font-size:14px;line-height:1.6;overflow:hidden}
 
 /* TOPBAR */
 #topbar{position:fixed;top:0;left:0;right:0;height:56px;z-index:300;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px}
@@ -44,9 +44,9 @@ body{background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;paddi
 
 /* PANEL: always block, hidden via JS only when another tab is active */
 /* Default: ALL panels hidden */
-.panel{display:none}
+.panel{position:fixed;top:56px;left:0;right:0;bottom:48px;overflow-y:auto;background:#0b1118;color:#e8eef4;display:none;-webkit-overflow-scrolling:touch}
 /* JS sets display:block on active panel */
-.panel.active{display:block !important;background:#0b1118 !important;color:#e8eef4 !important;min-height:200px}
+.panel.active{display:block}
 
 .section-hdr{margin-bottom:18px;padding-top:8px}
 .section-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:#e8eef4 !important;margin-bottom:4px}
@@ -1353,7 +1353,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 
 </div>
 
-<div id="panel-timeline" class="panel">
+<div id="panel-timeline" class="panel"><div id="tl-debug" style="background:red;color:white;padding:20px;font-size:24px;font-weight:bold">TIMELINE PANEL IS SHOWING</div>
 
   <div class="panel-scroll">
     <div class="section-hdr">
@@ -2969,25 +2969,22 @@ function loadFeedback(){
 // PANE NAVIGATION
 // ══════════════════════════════════════════
 function showPane(id){
-  var all = document.querySelectorAll('.panel');
+  var all=document.querySelectorAll('.panel');
   for(var i=0;i<all.length;i++){
     all[i].classList.remove('active');
     all[i].style.display='none';
   }
-  var p = document.getElementById('panel-'+id);
-  if(p){ p.classList.add('active'); p.style.display='block'; }
-
-  var navEls = document.querySelectorAll('.ttab,.snav,.bd-tab');
+  var p=document.getElementById('panel-'+id);
+  if(p){p.classList.add('active');p.style.display='block';}
+  var navEls=document.querySelectorAll('.ttab,.snav,.bd-tab');
   for(var j=0;j<navEls.length;j++) navEls[j].classList.remove('active');
-  var nav = [document.getElementById('tt-'+id), document.getElementById('snav-'+id), document.getElementById('bd-'+id)];
-  for(var k=0;k<nav.length;k++) if(nav[k]) nav[k].classList.add('active');
-
-  if(id==='timeline') renderTimeline();
-  if(id==='costs')    renderCosts();
-  if(id==='news')     fetchLatestNews();
-  if(id==='rates')    calcRates();
-  if(id==='policy')   renderPolicy();
-  window.scrollTo(0,0);
+  var ids=['tt-','snav-','bd-'];
+  for(var k=0;k<ids.length;k++){var el=document.getElementById(ids[k]+id);if(el)el.classList.add('active');}
+  try{if(id==='timeline')renderTimeline();}catch(e){}
+  try{if(id==='costs')renderCosts();}catch(e){}
+  try{if(id==='news')fetchLatestNews();}catch(e){}
+  try{if(id==='rates')calcRates();}catch(e){}
+  try{if(id==='policy')renderPolicy();}catch(e){}
 }
 
 // ══════════════════════════════════════════
@@ -3204,7 +3201,7 @@ window.addEventListener('load',()=>{
   var ap=document.querySelectorAll('.panel');
   for(var i=0;i<ap.length;i++){ap[i].style.display='none';}
   var ic=document.getElementById('panel-calc');
-  if(ic){ic.style.display='block';ic.classList.add('active');}
+  if(ic){ic.style.display='block';}
   // Default date
   const todayStr=new Date().toISOString().split('T')[0];
   const tld=document.getElementById('tl-start-date');
