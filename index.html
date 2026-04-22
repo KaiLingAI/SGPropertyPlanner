@@ -1267,15 +1267,19 @@ select.input-select:focus {
     margin: 14mm 12mm;
   }
  
-  body {
+  html, body {
     background: #fff !important;
     color: #000;
-    font-size: 11pt;
+    font-size: 10.5pt;
     line-height: 1.4;
     background-image: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
   }
  
-  /* Hide everything not essential to the report */
+  /* Hide every non-essential UI chrome element */
   .site-header,
   .tabs-sticky-wrap,
   .hero,
@@ -1283,63 +1287,96 @@ select.input-select:focus {
   .footer,
   .agent-bubble,
   .agent-bubble-panel,
-  .header-cta {
+  .agent-backdrop,
+  .header-cta,
+  .print-btn,
+  .floating-bar,
+  .dashboard-wrap,
+  .stress-test-bar {
     display: none !important;
   }
  
-  /* Expand the calculator to full width */
+  /* Calculator: collapse grid into a single column, no gap so nothing gets orphaned */
   .calculator-wrap {
     display: block !important;
     padding: 0 !important;
     max-width: 100% !important;
+    margin: 0 !important;
+    gap: 0 !important;
   }
  
-  /* Add a print-only header */
+  /* Print-only header */
   .print-header {
     display: block !important;
     border-bottom: 2px solid #000;
     padding-bottom: 10px;
-    margin-bottom: 18px;
+    margin: 0 0 16px 0;
   }
  
   .print-header h1 {
     font-family: 'Lexend', sans-serif;
-    font-size: 20pt;
+    font-size: 18pt;
     font-weight: 700;
     margin: 0 0 4px 0;
     color: #000;
   }
  
   .print-header p {
-    font-size: 10pt;
+    font-size: 9.5pt;
     color: #555;
     margin: 0;
   }
  
+  /* Panel: DO NOT use page-break-inside: avoid — it's taller than a page and causes blank page 1 */
   .panel {
     box-shadow: none !important;
     border: 1px solid #999 !important;
-    padding: 16px !important;
-    page-break-inside: avoid;
-    margin-bottom: 16px;
+    padding: 12px 14px !important;
+    margin: 0 0 14px 0 !important;
+    background: #fff !important;
   }
  
-  .panel-title { font-size: 15pt; color: #000; }
-  .panel-subtitle { font-size: 10pt; color: #555; }
+  .panel-title {
+    font-size: 14pt;
+    color: #000;
+    margin: 0 0 2px 0;
+  }
+  .panel-subtitle {
+    font-size: 9.5pt;
+    color: #555;
+    margin-bottom: 10px;
+  }
  
-  /* Results card - turn dark theme into printable light */
+  /* Release sticky positioning for the results panel on print */
+  .results {
+    position: static !important;
+    top: auto !important;
+  }
+ 
+  /* Smaller sections with tighter padding so more fits per page */
+  .section {
+    margin-bottom: 10px !important;
+    padding-bottom: 8px !important;
+  }
+  .section:last-child {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  .section-label {
+    font-size: 9pt !important;
+    margin-bottom: 6px !important;
+  }
+  .input-group label { font-size: 9.5pt !important; margin-bottom: 3px !important; }
+ 
+  /* Results card: dark theme → clean light print version */
   .results-card {
     background: #fff !important;
     color: #000 !important;
     border: 1px solid #000 !important;
-    padding: 16px !important;
-    page-break-inside: avoid;
+    padding: 12px 14px !important;
   }
  
-  .results-card * {
-    color: #000 !important;
-  }
- 
+  .results-card * { color: #000 !important; }
   .results-card::before { display: none !important; }
  
   .results-label,
@@ -1357,20 +1394,35 @@ select.input-select:focus {
     color: #000 !important;
   }
  
-  .results { position: static !important; top: auto !important; }
+  .big-number {
+    font-size: 22pt !important;
+    margin-bottom: 2px !important;
+  }
+  .big-caption {
+    font-size: 9pt !important;
+    margin-bottom: 10px !important;
+  }
  
   .metric-grid {
     background: #fff !important;
-    border: 1px solid #999;
+    border: 1px solid #999 !important;
+    margin-bottom: 10px !important;
   }
  
-  .metric { background: #fff !important; border-right: 1px solid #999; }
+  .metric {
+    background: #fff !important;
+    border-right: 1px solid #999;
+    padding: 8px 10px !important;
+  }
+  .metric-label { font-size: 8.5pt !important; margin-bottom: 3px !important; }
+  .metric-value { font-size: 12pt !important; }
+  .metric-value.small { font-size: 10.5pt !important; }
+  .metric-sub { font-size: 8pt !important; }
  
   .ratio-track {
     background: #e0e0e0 !important;
     border: 1px solid #999;
   }
- 
   .ratio-fill { background: #555 !important; }
   .ratio-fill.over { background: #000 !important; }
   .ratio-limit { background: #000 !important; }
@@ -1385,6 +1437,8 @@ select.input-select:focus {
     background: #f5f5f5 !important;
     border-left: 3px solid #000 !important;
     color: #000 !important;
+    padding: 8px 10px !important;
+    font-size: 9.5pt !important;
   }
   .warning-box *, .info-box * { color: #000 !important; }
  
@@ -1394,58 +1448,80 @@ select.input-select:focus {
   }
   #grants-applied * { color: #000 !important; }
  
-  /* Hide dropdowns/inputs borders on print but keep values visible */
+  /* Input fields: show value clearly, collapse decoration */
   .input-field input,
   select.input-select {
     border: 1px solid #999 !important;
     background: #fff !important;
     color: #000 !important;
     font-weight: 600;
+    padding: 6px 8px !important;
+    font-size: 10pt !important;
   }
  
-  /* Buyer toggles - show active state more clearly */
-  .buyer-btn { display: none; }
+  .input-row { gap: 8px !important; margin-bottom: 8px !important; }
+ 
+  /* Active buyer toggle button — show only the active state */
+  .buyer-btn { display: none !important; }
   .buyer-btn.active {
     display: inline-block !important;
     background: #000 !important;
     color: #fff !important;
-    padding: 4px 10px !important;
+    padding: 3px 10px !important;
     border-radius: 3px;
+    font-size: 9pt !important;
   }
  
-  /* Grant lines rendering */
   #grant-breakdown {
     background: #f5f5f5 !important;
     border-left: 3px solid #000 !important;
+    padding: 8px 10px !important;
   }
  
   .disclosure {
     color: #333 !important;
-    font-size: 9pt;
-    padding: 10px 0 !important;
+    font-size: 8.5pt !important;
+    padding: 8px 0 !important;
+    line-height: 1.45 !important;
   }
  
   .bottom-disclaimer {
     background: #fff !important;
     color: #333 !important;
     border-top: 1px solid #000 !important;
-    padding: 16px 0 !important;
-    font-size: 9pt !important;
-    page-break-inside: avoid;
+    padding: 12px 0 4px !important;
+    font-size: 8.5pt !important;
+    line-height: 1.4 !important;
   }
-  .bottom-disclaimer h4 { color: #000 !important; }
+  .bottom-disclaimer h4 { color: #000 !important; font-size: 10pt !important; margin-bottom: 6px !important; }
   .bottom-disclaimer * { color: #333 !important; }
   .bottom-disclaimer strong { color: #000 !important; }
+  .bottom-disclaimer p { margin-bottom: 5px !important; }
  
-  /* Print footer with page number */
   .print-footer {
     display: block !important;
     text-align: center;
     font-size: 8pt;
     color: #666;
-    padding-top: 10px;
+    padding-top: 8px;
     border-top: 1px solid #ccc;
-    margin-top: 20px;
+    margin-top: 14px;
+  }
+ 
+  /* Allow page breaks between logical sections, but NEVER orphan the last line */
+  .panel, .results-card, .bottom-disclaimer {
+    page-break-inside: auto;
+  }
+ 
+  /* Avoid breaking section headers from their content */
+  .section-label, .panel-title, .results-label, .results-title,
+  .bottom-disclaimer h4 {
+    page-break-after: avoid;
+  }
+ 
+  /* Don't break a ratio bar across pages — they're small enough to avoid */
+  .ratio-bar, .verdict, .metric {
+    page-break-inside: avoid;
   }
 }
  
